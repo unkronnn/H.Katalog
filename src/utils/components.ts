@@ -1,410 +1,439 @@
-import {
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  StringSelectMenuBuilder,
-  EmbedBuilder,
-  APIEmbed
-}                                   from 'discord.js';
+// - Discord component v2 builder utilities - \\
 
-// - COMPONENT INTERFACES - \\
-
-interface container_component {
-  components : any[];
+export enum component_type {
+  action_row = 1,
+  button = 2,
+  string_select = 3,
+  text_input = 4,
+  user_select = 5,
+  role_select = 6,
+  mentionable_select = 7,
+  channel_select = 8,
+  section = 9,
+  text = 10,
+  thumbnail = 11,
+  media_gallery = 12,
+  file = 13,
+  divider = 14,
+  separator = 14,
+  content_inventory_entry = 16,
+  container = 17,
 }
 
-interface text_component {
-  content : string | string[];
+export enum button_style {
+  primary = 1,
+  secondary = 2,
+  success = 3,
+  danger = 4,
+  link = 5,
 }
 
-interface divider_component {
-  lines : number;
+export interface button_component {
+  type        : number;
+  style       : number;
+  label       : string;
+  custom_id?  : string;
+  url?        : string;
+  emoji?      : { id?: string; name: string };
+  disabled?   : boolean;
 }
 
-interface section_component {
-  content   : string[];
-  thumbnail?: string;
+export interface action_row_component {
+  type       : number;
+  components : button_component[] | select_menu_component[];
 }
 
-interface action_row_component {
-  components : any[];
+export interface select_option {
+  label      : string;
+  value      : string;
+  description?: string;
+  emoji?     : { id?: string; name: string };
+  default?   : boolean;
 }
 
-interface select_menu_component {
+export interface select_menu_component {
+  type       : number;
   custom_id  : string;
-  placeholder: string;
-  options    : Array<{
-    label      : string;
-    value      : string;
-    description?: string;
-    emoji?      : string;
-  }>;
+  placeholder?: string;
+  options?   : select_option[];
+  min_values?: number;
+  max_values?: number;
 }
 
-interface button_component {
-  label : string;
-  id    ?: string;
-  url   ?: string;
-  style ?: 'primary' | 'secondary' | 'success' | 'danger' | 'link';
+export interface thumbnail_component {
+  type : number;
+  media: { url: string };
 }
 
-interface message_components {
-  components: container_component[];
+export interface text_component {
+  type   : number;
+  content: string;
+}
+
+export interface section_component {
+  type      : number;
+  components: text_component[];
+  accessory?: thumbnail_component | button_component;
+}
+
+export interface divider_component {
+  type    : number;
+  spacing?: number;
+  divider?: boolean;
+}
+
+export interface container_component {
+  type        : number;
+  components  : (section_component | text_component | divider_component | action_row_component)[];
+  accent_color?: number | { r: number; g: number; b: number } | null;
+  spoiler?    : boolean;
+}
+
+export interface message_payload {
+  flags?     : number;
+  content?   : string;
+  components: (container_component | text_component | file_component)[];
+}
+
+export interface file_component {
+  type: number;
+  file: { url: string };
 }
 
 // - COMPONENT BUILDERS - \\
 
 /**
- * Create container component
- * @param config container_component
- * @return container_component
+ * Create primary button component
+ * @param label string
+ * @param custom_id string
+ * @param emoji object
+ * @param disabled boolean
+ * @return button_component
  */
-const container = (config: container_component): container_component => {
-  return config;
-};
+export function primary_button(
+  label     : string,
+  custom_id : string,
+  emoji?    : { id?: string; name: string },
+  disabled? : boolean
+): button_component {
+  return {
+    type     : component_type.button,
+    style    : button_style.primary,
+    label,
+    custom_id,
+    emoji,
+    disabled,
+  };
+}
+
+/**
+ * Create secondary button component
+ * @param label string
+ * @param custom_id string
+ * @param emoji object
+ * @param disabled boolean
+ * @return button_component
+ */
+export function secondary_button(
+  label     : string,
+  custom_id : string,
+  emoji?    : { id?: string; name: string },
+  disabled? : boolean
+): button_component {
+  return {
+    type     : component_type.button,
+    style    : button_style.secondary,
+    label,
+    custom_id,
+    emoji,
+    disabled,
+  };
+}
+
+/**
+ * Create success button component
+ * @param label string
+ * @param custom_id string
+ * @param emoji object
+ * @param disabled boolean
+ * @return button_component
+ */
+export function success_button(
+  label     : string,
+  custom_id : string,
+  emoji?    : { id?: string; name: string },
+  disabled? : boolean
+): button_component {
+  return {
+    type     : component_type.button,
+    style    : button_style.success,
+    label,
+    custom_id,
+    emoji,
+    disabled,
+  };
+}
+
+/**
+ * Create danger button component
+ * @param label string
+ * @param custom_id string
+ * @param emoji object
+ * @param disabled boolean
+ * @return button_component
+ */
+export function danger_button(
+  label     : string,
+  custom_id : string,
+  emoji?    : { id?: string; name: string },
+  disabled? : boolean
+): button_component {
+  return {
+    type     : component_type.button,
+    style    : button_style.danger,
+    label,
+    custom_id,
+    emoji,
+    disabled,
+  };
+}
+
+/**
+ * Create link button component
+ * @param label string
+ * @param url string
+ * @param emoji object
+ * @param disabled boolean
+ * @return button_component
+ */
+export function link_button(
+  label     : string,
+  url       : string,
+  emoji?    : { id?: string; name: string },
+  disabled? : boolean
+): button_component {
+  return {
+    type     : component_type.button,
+  style    : button_style.link,
+  label,
+  url,
+  emoji,
+  disabled,
+  };
+}
+
+/**
+ * Create action row component
+ * @param components button_component[]
+ * @return action_row_component
+ */
+export function action_row(...components: button_component[]): action_row_component {
+  return {
+    type     : component_type.action_row,
+    components,
+  };
+}
+
+/**
+ * Create select menu component
+ * @param custom_id string
+ * @param placeholder string
+ * @param options select_option[]
+ * @return action_row_component
+ */
+export function select_menu(
+  custom_id  : string,
+  placeholder: string,
+  options    : select_option[]
+): action_row_component {
+  return {
+    type: component_type.action_row,
+    components: [
+      {
+        type       : component_type.string_select,
+        custom_id,
+        placeholder,
+        options,
+      },
+    ],
+  };
+}
+
+/**
+ * Create thumbnail component
+ * @param url string
+ * @return thumbnail_component
+ */
+export function thumbnail(url: string): thumbnail_component {
+  return {
+    type : component_type.thumbnail,
+    media: { url },
+  };
+}
 
 /**
  * Create text component
  * @param content string | string[]
  * @return text_component
  */
-const text = (content: string | string[]): text_component => {
+export function text(content: string | string[]): text_component {
   return {
-    content: content
+    type   : component_type.text,
+    content: Array.isArray(content) ? content.join('\n') : content,
   };
-};
-
-/**
- * Create divider component
- * @param lines number
- * @return divider_component
- */
-const divider = (lines: number = 1): divider_component => {
-  return {
-    lines: lines
-  };
-};
+}
 
 /**
  * Create section component
- * @param content string[]
- * @param thumbnail string
+ * @param options object
  * @return section_component
  */
-const section = (content: string[], thumbnail?: string): section_component => {
-  return {
-    content  : content,
-    thumbnail: thumbnail
+export function section(options: {
+  content   : string | string[];
+  thumbnail?: string;
+  media?    : string;
+  accessory?: thumbnail_component | button_component;
+}): section_component {
+  const result: section_component = {
+    type      : component_type.section,
+    components: [text(options.content)],
   };
-};
+
+  // - HANDLE EXPLICIT ACCESSORY (BUTTON OR MEDIA) - \\
+  if (options.accessory) {
+    if (
+      (options.accessory.type === component_type.thumbnail && (options.accessory as any).media?.url) ||
+      (options.accessory.type === component_type.button)
+    ) {
+      result.accessory = options.accessory;
+    }
+  }
+  // - FALLBACK TO MEDIA/THUMBNAIL - \\
+  else {
+    const media_url = options.media || options.thumbnail;
+
+    if (media_url && typeof media_url === 'string' && media_url.trim().length > 0 && media_url.startsWith('http')) {
+      result.accessory = thumbnail(media_url);
+    }
+  }
+
+  return result;
+}
 
 /**
- * Create primary button component
- * @param label string
- * @param id string
- * @return button_component
+ * Create divider component
+ * @param spacing number
+ * @return divider_component
  */
-const primary_button = (label: string, id: string): button_component => {
-  return {
-    label: label,
-    style : 'primary',
-    id    : id
+export function divider(spacing?: number): divider_component {
+  const result: divider_component = {
+    type: component_type.divider,
   };
-};
+
+  if (spacing !== undefined) {
+    result.spacing = spacing;
+  }
+
+  return result;
+}
 
 /**
- * Create secondary button component
- * @param label string
- * @param id string
- * @return button_component
+ * Create separator component (alias for divider)
+ * @param spacing number
+ * @return divider_component
  */
-const secondary_button = (label: string, id: string): button_component => {
-  return {
-    label: label,
-    style : 'secondary',
-    id    : id
-  };
-};
+export function separator(spacing?: number): divider_component {
+  return divider(spacing);
+}
 
 /**
- * Create success button component
- * @param label string
- * @param id string
- * @return button_component
+ * Create container component
+ * @param options object
+ * @return container_component
  */
-const success_button = (label: string, id: string): button_component => {
+export function container(options: {
+  components     : (section_component | text_component | divider_component | action_row_component)[];
+  accent_color?  : number | { r: number; g: number; b: number } | null;
+  spoiler?       : boolean;
+}): container_component {
+  let processed_color = options.accent_color;
+
+  if (
+    options.accent_color &&
+    typeof options.accent_color === 'object' &&
+    'r' in options.accent_color &&
+    'g' in options.accent_color &&
+    'b' in options.accent_color
+  ) {
+    processed_color = (options.accent_color.r << 16) | (options.accent_color.g << 8) | options.accent_color.b;
+  }
+
   return {
-    label: label,
-    style : 'success',
-    id    : id
+    type        : component_type.container,
+    components  : options.components,
+    accent_color: processed_color as number | null | undefined,
+    spoiler     : options.spoiler,
   };
-};
+}
 
 /**
- * Create danger button component
- * @param label string
- * @param id string
- * @return button_component
+ * Build message payload with suppress embeds flag
+ * @param options object
+ * @return message_payload
  */
-const danger_button = (label: string, id: string): button_component => {
+export function build_message(options: {
+  components: (container_component | text_component)[];
+  content?  : string;
+}): message_payload {
   return {
-    label: label,
-    style : 'danger',
-    id    : id
+    flags     : 64, // SUPPRESS_EMBEDS - This is the key!
+    content   : options.content,
+    components: options.components,
   };
-};
+}
 
 /**
- * Create link button component
- * @param label string
+ * Create emoji object
+ * @param name string
+ * @param id string
+ * @return object
+ */
+export function emoji_object(name: string, id?: string): { id?: string; name: string } {
+  return id ? { id, name } : { name };
+}
+
+/**
+ * Create file component
  * @param url string
- * @return button_component
+ * @return file_component
  */
-const link_button = (label: string, url: string): button_component => {
+export function file(url: string): file_component {
   return {
-    label: label,
-    style : 'link',
-    url   : url
+    type: component_type.file,
+    file: { url },
   };
-};
+}
+
+// - LEGACY FUNCTIONS (Backward compatibility) - \\
+
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  StringSelectMenuBuilder,
+  EmbedBuilder,
+} from 'discord.js';
 
 /**
- * Create select menu component
- * @param custom_id string
- * @param placeholder string
- * @param options Array<{label: string, value: string, description?: string, emoji?: string}>
- * @return select_menu_component
+ * Create embed with Component V2 format (LEGACY)
  */
-const select_menu = (
-  custom_id  : string,
-  placeholder: string,
-  options    : Array<{
-    label      : string;
-    value      : string;
-    description?: string;
-    emoji?      : string;
-  }>
-): select_menu_component => {
-  return {
-    custom_id  : custom_id,
-    placeholder: placeholder,
-    options    : options
-  };
-};
-
-/**
- * Create action row component
- * @param components any[]
- * @return action_row_component
- */
-const action_row = (...components: any[]): action_row_component => {
-  return {
-    components: components
-  };
-};
-
-/**
- * Build message from components
- * @param config message_components
- * @return message_components
- */
-const build_message = (config: message_components): message_components => {
-  return config;
-};
-
-/**
- * Process container component to Discord format
- * @param container container_component
- * @return { embed: APIEmbed, components: any[] }
- */
-const process_container = (container: container_component): {
-  embed     : APIEmbed;
-  components: any[];
-} => {
-  const embed        : any  = {};
-  const discord_components: any[] = [];
-  const parts        : string[] = [];
-
-  for (const item of container.components) {
-    // - HANDLE TEXT COMPONENT - \\
-
-    if ('content' in item) {
-      const content = (item as text_component).content;
-
-      if (content) {
-        if (Array.isArray(content)) {
-          parts.push(...content);
-        } else if (content.trim() !== '') {
-          parts.push(content);
-        }
-      }
-    }
-
-    // - HANDLE DIVIDER COMPONENT - \\
-
-    else if ('lines' in item) {
-      const lines = (item as divider_component).lines;
-      for (let i = 0; i < lines; i++) {
-        parts.push('');
-      }
-    }
-
-    // - HANDLE SECTION COMPONENT - \\
-
-    else if ('content' in item && 'thumbnail' in item) {
-      const section       = item as section_component;
-
-      if (section.content && section.content.length > 0) {
-        parts.push(...section.content);
-      }
-
-      if (section.thumbnail) {
-        embed.thumbnail = { url: section.thumbnail };
-      }
-    }
-
-    // - HANDLE ACTION ROW COMPONENT - \\
-
-    else if ('components' in item && Array.isArray((item as action_row_component).components)) {
-      const action_row_config = item as action_row_component;
-      const discord_component = build_action_row_from_config(action_row_config);
-
-      if (discord_component) {
-        discord_components.push(discord_component);
-      }
-    }
-  }
-
-  // - BUILD EMBED DESCRIPTION - \\
-
-  const description = parts.join('\n').trim();
-
-  if (!description || description === '') {
-    embed.description = ' ';
-  } else {
-    embed.description = description;
-  }
-
-  embed.timestamp = new Date().toISOString();
-
-  return {
-    embed     : embed,
-    components: discord_components
-  };
-};
-
-/**
- * Build Discord action row from action_row config
- * @param config action_row_component
- * @return ActionRowBuilder<any> | null
- */
-const build_action_row_from_config = (config: action_row_component): ActionRowBuilder<any> | null => {
-  const row = new ActionRowBuilder<any>();
-
-  for (const component_config of config.components) {
-    // - HANDLE BUTTON COMPONENT - \\
-
-    if ('label' in component_config && ('id' in component_config || 'url' in component_config)) {
-      const button_config = component_config as button_component;
-      const button        = new ButtonBuilder();
-
-      button.setLabel(button_config.label);
-
-      const style_map: Record<string, ButtonStyle> = {
-        primary  : ButtonStyle.Primary,
-        secondary: ButtonStyle.Secondary,
-        success  : ButtonStyle.Success,
-        danger   : ButtonStyle.Danger,
-        link     : ButtonStyle.Link
-      };
-
-      button.setStyle(style_map[button_config.style || 'secondary']);
-
-      if (button_config.id) {
-        button.setCustomId(button_config.id);
-      }
-
-      if (button_config.url) {
-        button.setURL(button_config.url);
-      }
-
-      row.addComponents(button);
-    }
-
-    // - HANDLE SELECT MENU COMPONENT - \\
-
-    else if ('custom_id' in component_config && 'options' in component_config) {
-      const select_config = component_config as select_menu_component;
-      const select        = new StringSelectMenuBuilder();
-
-      select.setCustomId(select_config.custom_id);
-      select.setPlaceholder(select_config.placeholder);
-
-      select.addOptions(
-        select_config.options.map((opt) => ({
-          label     : opt.label,
-          value     : opt.value,
-          description: opt.description || undefined,
-          emoji     : opt.emoji || undefined
-        }))
-      );
-
-      row.addComponents(select);
-    }
-  }
-
-  return row;
-};
-
-// - CONVERT TO DISCORD FORMAT - \\
-
-/**
- * Convert message components to Discord format
- * @param message message_components
- * @return { embeds: APIEmbed[], components: any[] }
- */
-const convert_to_discord_format = (message: message_components): {
-  embeds    : APIEmbed[];
-  components: any[];
-} => {
-  const embeds        : APIEmbed[] = [];
-  const discord_components: any[] = [];
-
-  for (const container_config of message.components) {
-    const result = process_container(container_config);
-
-    if (result.embed) {
-      embeds.push(result.embed);
-    }
-
-    if (result.components) {
-      discord_components.push(...result.components);
-    }
-  }
-
-  return {
-    embeds    : embeds,
-    components: discord_components
-  };
-};
-
-// - LEGACY FUNCTIONS (Kept for backward compatibility) - \\
-
-/**
- * Create embed with Component V2 format
- * @param title string
- * @param description string
- * @param color number | null
- * @param fields Array<{name: string, value: string, inline: boolean}>
- * @return EmbedBuilder
- */
-const create_embed_v2 = (
+export function create_embed_v2(
   title      : string,
   description: string,
   color      : number | null,
   fields?    : Array<{ name: string; value: string; inline: boolean }>
-): EmbedBuilder => {
-  const embed                   = new EmbedBuilder();
+): EmbedBuilder {
+  const embed = new EmbedBuilder();
 
   if (color !== null) {
     embed.setColor(color);
@@ -420,16 +449,12 @@ const create_embed_v2 = (
   embed.setTimestamp();
 
   return embed;
-};
+}
 
 /**
- * Create select menu component with Component V2 format
- * @param custom_id string
- * @param placeholder string
- * @param options Array<{label: string, value: string, description: string, emoji?: string}>
- * @return ActionRowBuilder<StringSelectMenuBuilder>
+ * Create select menu component with Component V2 format (LEGACY)
  */
-const create_select_menu_v2 = (
+export function create_select_menu_v2(
   custom_id  : string,
   placeholder: string,
   options    : Array<{
@@ -438,34 +463,29 @@ const create_select_menu_v2 = (
     description: string;
     emoji?     : string;
   }>
-): ActionRowBuilder<StringSelectMenuBuilder> => {
-  const select_menu             = new StringSelectMenuBuilder();
+): ActionRowBuilder<StringSelectMenuBuilder> {
+  const select_menu = new StringSelectMenuBuilder();
 
   select_menu.setCustomId(custom_id);
   select_menu.setPlaceholder(placeholder);
   select_menu.addOptions(options);
 
-  const row                     = new ActionRowBuilder<StringSelectMenuBuilder>();
+  const row = new ActionRowBuilder<StringSelectMenuBuilder>();
   row.addComponents(select_menu);
 
   return row;
-};
+}
 
 /**
- * Create button component with Component V2 format
- * @param label string
- * @param style ButtonStyle
- * @param url string
- * @param emoji string
- * @return ActionRowBuilder<ButtonBuilder>
+ * Create button component with Component V2 format (LEGACY)
  */
-const create_button_v2 = (
+export function create_button_v2(
   label : string,
   style : ButtonStyle,
   url   : string,
   emoji?: string
-): ActionRowBuilder<ButtonBuilder> => {
-  const button                  = new ButtonBuilder();
+): ActionRowBuilder<ButtonBuilder> {
+  const button = new ButtonBuilder();
 
   button.setLabel(label);
   button.setStyle(style);
@@ -475,29 +495,8 @@ const create_button_v2 = (
     button.setEmoji(emoji);
   }
 
-  const row                     = new ActionRowBuilder<ButtonBuilder>();
+  const row = new ActionRowBuilder<ButtonBuilder>();
   row.addComponents(button);
 
   return row;
-};
-
-// - EXPORTS - \\
-
-export {
-  container,
-  text,
-  divider,
-  section,
-  primary_button,
-  secondary_button,
-  success_button,
-  danger_button,
-  link_button,
-  select_menu,
-  action_row,
-  build_message,
-  convert_to_discord_format,
-  create_embed_v2,
-  create_select_menu_v2,
-  create_button_v2
-};
+}

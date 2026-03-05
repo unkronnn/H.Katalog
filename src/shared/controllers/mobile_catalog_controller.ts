@@ -1,18 +1,10 @@
 import {
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  EmbedBuilder,
   Interaction,
-  StringSelectMenuBuilder,
   StringSelectMenuInteraction,
   MessageFlags
 }                                     from 'discord.js';
 import { log_error }                   from '../../utils/error_logger';
 import {
-  create_embed_v2,
-  create_select_menu_v2,
-  create_button_v2,
   container,
   text,
   divider,
@@ -20,9 +12,9 @@ import {
   action_row,
   link_button,
   select_menu,
-  build_message,
-  convert_to_discord_format
+  build_message
 }                                     from '../../utils/components';
+import { send_components_v2, get_token } from '../../utils/api';
 import {
   get_dummy_vendors_by_game,
   get_dummy_vendor_detail
@@ -142,45 +134,38 @@ const __max_display_items  = 25;
 // - EMBED BUILDERS - \\
 
 /**
- * Build mobile games catalog embed
- * @return Promise<{ embed: EmbedBuilder, component: ActionRowBuilder<StringSelectMenuBuilder> }>
+ * Build mobile games catalog message
+ * @return Promise<message_payload>
  */
-const build_mobile_catalog_embed = async (): Promise<{
-  embed    : EmbedBuilder;
-  component: ActionRowBuilder<StringSelectMenuBuilder>;
-}> => {
+const build_mobile_catalog_message = async (): Promise<message_payload> => {
   try {
-    const options              = __mobile_games.map((game) => ({
+    const options = __mobile_games.map((game) => ({
       label      : game.game_name,
       value      : game.game_id,
       description: game.description,
-      emoji      : game.emoji
+      emoji      : { name: game.emoji.replace(/<:([^:]+):[^>]+>/, '$1') }
     }));
 
     // - BUILD GAME LIST TEXT - \\
 
-    const game_list_parts      = [];
+    const game_list_parts = [];
 
     for (const game of __mobile_games) {
       game_list_parts.push(`${game.emoji} **${game.game_name}** - ${game.description}`);
     }
 
-    // - CREATE MESSAGE WITH NEW PATTERN - \\
+    // - CREATE MESSAGE WITH LAYOUT COMPONENTS - \\
 
-    const message              = build_message({
+    const message = build_message({
       components: [
         container({
           components: [
-            section(
-              [
-                `## ${__game_emoji_map.mobile_legends} Mobile Games Catalog`
-              ],
-              'https://ui.shadcn.com/favicon.ico'
-            ),
+            section({
+              content  : `## ${__game_emoji_map.mobile_legends} Mobile Games Catalog`,
+              thumbnail: 'https://ui.shadcn.com/favicon.ico'
+            }),
             divider(2),
-            text([
-              ...game_list_parts
-            ]),
+            text(game_list_parts),
             divider(2),
             text([
               '**How to Order**',
@@ -203,51 +188,9 @@ const build_mobile_catalog_embed = async (): Promise<{
       ]
     });
 
-    // - CONVERT TO DISCORD FORMAT - \\
+    console.log('[ - MOBILE_CATALOG_CONTROLLER - ] Mobile catalog message built successfully');
 
-    const discord_format       = convert_to_discord_format(message);
-    const embed                = new EmbedBuilder();
-
-    if (discord_format.embeds[0]) {
-      const embed_data         = discord_format.embeds[0];
-
-      if (embed_data.title) {
-        embed.setTitle(embed_data.title);
-      }
-
-      if (embed_data.description) {
-        embed.setDescription(embed_data.description);
-      }
-
-      if (!embed.data.description) {
-        embed.setDescription(' ');
-      }
-
-      if (embed_data.timestamp) {
-        embed.setTimestamp(new Date(embed_data.timestamp));
-      }
-
-      if (embed_data.footer) {
-        embed.setFooter(embed_data.footer);
-      }
-
-      if (embed_data.author) {
-        embed.setAuthor(embed_data.author);
-      }
-
-      if (embed_data.fields) {
-        embed.addFields(embed_data.fields);
-      }
-    }
-
-    const component            = discord_format.components[0] as ActionRowBuilder<StringSelectMenuBuilder>;
-
-    console.log('[ - MOBILE_CATALOG_CONTROLLER - ] Mobile catalog embed built successfully');
-
-    return {
-      embed    : embed,
-      component: component
-    };
+    return message;
   } catch (error) {
     await log_error(error);
     throw error;
