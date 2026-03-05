@@ -5,7 +5,8 @@ import {
   EmbedBuilder,
   Interaction,
   StringSelectMenuBuilder,
-  StringSelectMenuInteraction
+  StringSelectMenuInteraction,
+  MessageFlags
 }                                     from 'discord.js';
 import { log_error }                   from '../../utils/error_logger';
 import {
@@ -357,7 +358,10 @@ const build_mobile_vendor_detail_embed = async (game_id: string, vendor_name: st
     buy_button.setLabel('Buy Now');
     buy_button.setStyle(ButtonStyle.Link);
     buy_button.setURL('https://discord.gg/ticket-channel-dummy');
-    buy_button.setEmoji('<:cart:1234567893>');
+    buy_button.setEmoji({
+      name: 'cart',
+      id  : '1234567893'
+    });
 
     row.addComponents(buy_button);
 
@@ -389,7 +393,7 @@ const handle_mobile_game_selection = async (interaction: StringSelectMenuInterac
     await interaction.reply({
       embeds    : [embed],
       components : [component],
-      ephemeral   : true
+      flags      : MessageFlags.Ephemeral
     });
 
     console.log(`[ - MOBILE_CATALOG_CONTROLLER - ] Mobile game selected: ${game_id}`);
@@ -464,8 +468,7 @@ const show_mobile_catalog = async (interaction: Interaction): Promise<void> => {
       // - PUBLIC PERMANENT EMBED - Semua user bisa lihat
       await interaction.reply({
         embeds     : [embed],
-        components : [component],
-        ephemeral  : false
+        components : [component]
       });
 
       console.log('[ - MOBILE_CATALOG_CONTROLLER - ] Mobile catalog displayed successfully (permanent)');
