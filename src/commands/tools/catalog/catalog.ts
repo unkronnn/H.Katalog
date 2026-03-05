@@ -1,6 +1,6 @@
-import { SlashCommandBuilder }           from 'discord.js';
-import { show_catalog }                  from '../../../shared/controllers/catalog_controller';
-import { log_error }                     from '../../../utils/error_logger';
+import { SlashCommandBuilder, MessageFlags } from 'discord.js';
+import { show_catalog }                      from '../../../shared/controllers/catalog_controller';
+import { log_error }                         from '../../../utils/error_logger';
 
 // - COMMAND DEFINITION - \\
 
@@ -28,8 +28,8 @@ const execute = async (interaction: any): Promise<void> => {
 
     if (interaction.isRepliable() && !interaction.replied && !interaction.deferred) {
       await interaction.reply({
-        content   : 'An error occurred while displaying the catalog. Please try again later.',
-        ephemeral : true
+        content : 'An error occurred while displaying the catalog. Please try again later.',
+        flags   : MessageFlags.Ephemeral
       });
     }
   }

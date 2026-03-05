@@ -283,8 +283,7 @@ const show_catalog = async (interaction: Interaction): Promise<void> => {
     if (interaction.isRepliable()) {
       await interaction.reply({
         embeds     : [embed],
-        components : [component],
-        ephemeral  : false
+        components : [component]
       });
 
       console.log('[ - CATALOG_CONTROLLER - ] Catalog displayed successfully');

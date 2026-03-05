@@ -1,4 +1,4 @@
-import { Client, Interaction }                   from 'discord.js';
+import { Client, Interaction, MessageFlags }      from 'discord.js';
 import { handle_catalog_interaction }            from '../shared/controllers/catalog_controller';
 import { handle_mobile_catalog_interaction }     from '../shared/controllers/mobile_catalog_controller';
 import { log_error }                              from '../utils/error_logger';
@@ -34,8 +34,8 @@ const setup_interaction_handler = (client: Client): void => {
 
       if (interaction.isRepliable() && !interaction.replied && !interaction.deferred) {
         await interaction.reply({
-          content   : 'An error occurred while processing your request.',
-          ephemeral : true
+          content : 'An error occurred while processing your request.',
+          flags   : MessageFlags.Ephemeral
         });
       }
     }

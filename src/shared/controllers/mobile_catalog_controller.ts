@@ -358,10 +358,7 @@ const build_mobile_vendor_detail_embed = async (game_id: string, vendor_name: st
     buy_button.setLabel('Buy Now');
     buy_button.setStyle(ButtonStyle.Link);
     buy_button.setURL('https://discord.gg/ticket-channel-dummy');
-    buy_button.setEmoji({
-      name: 'cart',
-      id  : '1234567893'
-    });
+    buy_button.setEmoji('🛒');
 
     row.addComponents(buy_button);
 
