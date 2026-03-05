@@ -195,7 +195,39 @@ const build_mobile_catalog_embed = async (): Promise<{
 
     const embed                = new EmbedBuilder();
     if (message.embeds[0]) {
-      Object.assign(embed, message.embeds[0]);
+      const embed_data         = message.embeds[0];
+
+      // - MANUALLY SET EMBED PROPERTIES - \\
+
+      if (embed_data.title) {
+        embed.setTitle(embed_data.title);
+      }
+
+      if (embed_data.description) {
+        embed.setDescription(embed_data.description);
+      }
+
+      // - ENSURE DESCRIPTION EXISTS - \\
+
+      if (!embed.data.description) {
+        embed.setDescription(' ');
+      }
+
+      if (embed_data.timestamp) {
+        embed.setTimestamp(new Date(embed_data.timestamp));
+      }
+
+      if (embed_data.footer) {
+        embed.setFooter(embed_data.footer);
+      }
+
+      if (embed_data.author) {
+        embed.setAuthor(embed_data.author);
+      }
+
+      if (embed_data.fields) {
+        embed.addFields(embed_data.fields);
+      }
     }
 
     const component            = message.components[0] as ActionRowBuilder<StringSelectMenuBuilder>;
@@ -270,7 +302,35 @@ const build_mobile_vendor_selection_embed = async (game_id: string): Promise<{
 
     const embed                = new EmbedBuilder();
     if (message.embeds[0]) {
-      Object.assign(embed, message.embeds[0]);
+      const embed_data         = message.embeds[0];
+
+      if (embed_data.title) {
+        embed.setTitle(embed_data.title);
+      }
+
+      if (embed_data.description) {
+        embed.setDescription(embed_data.description);
+      }
+
+      if (!embed.data.description) {
+        embed.setDescription(' ');
+      }
+
+      if (embed_data.timestamp) {
+        embed.setTimestamp(new Date(embed_data.timestamp));
+      }
+
+      if (embed_data.footer) {
+        embed.setFooter(embed_data.footer);
+      }
+
+      if (embed_data.author) {
+        embed.setAuthor(embed_data.author);
+      }
+
+      if (embed_data.fields) {
+        embed.addFields(embed_data.fields);
+      }
     }
 
     const component            = message.components[0] as ActionRowBuilder<StringSelectMenuBuilder>;
@@ -358,7 +418,35 @@ const build_mobile_vendor_detail_embed = async (game_id: string, vendor_name: st
 
     const embed              = new EmbedBuilder();
     if (message.embeds[0]) {
-      Object.assign(embed, message.embeds[0]);
+      const embed_data       = message.embeds[0];
+
+      if (embed_data.title) {
+        embed.setTitle(embed_data.title);
+      }
+
+      if (embed_data.description) {
+        embed.setDescription(embed_data.description);
+      }
+
+      if (!embed.data.description) {
+        embed.setDescription(' ');
+      }
+
+      if (embed_data.timestamp) {
+        embed.setTimestamp(new Date(embed_data.timestamp));
+      }
+
+      if (embed_data.footer) {
+        embed.setFooter(embed_data.footer);
+      }
+
+      if (embed_data.author) {
+        embed.setAuthor(embed_data.author);
+      }
+
+      if (embed_data.fields) {
+        embed.addFields(embed_data.fields);
+      }
     }
 
     const component          = message.components[0] as ActionRowBuilder<ButtonBuilder>;
