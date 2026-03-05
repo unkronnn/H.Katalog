@@ -236,13 +236,15 @@ const process_container = (container: component_container): {
   embed     : APIEmbed;
   components: any[];
 } => {
-  const embed   : any = {};
+  const embed   : any  = {};
   const components: any[] = [];
   const parts   : string[] = [];
 
   for (const item of container.components) {
     if (item.type === 'text') {
-      parts.push(item.text);
+      if (item.text && item.text.trim() !== '') {
+        parts.push(item.text);
+      }
     } else if (item.type === 'divider') {
       parts.push('─────────────────');
     } else if (item.type === 'action_row') {
@@ -253,8 +255,14 @@ const process_container = (container: component_container): {
     }
   }
 
-  if (parts.length > 0) {
-    embed.description = parts.join('\n');
+  const description = parts.join('\n').trim();
+
+  // - ENSURE DESCRIPTION IS NEVER EMPTY - \\
+
+  if (!description || description === '') {
+    embed.description = ' '; // Unicode space (em space) - required by Discord
+  } else {
+    embed.description = description;
   }
 
   embed.timestamp = new Date().toISOString();
