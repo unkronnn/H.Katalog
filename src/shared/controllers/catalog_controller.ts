@@ -37,36 +37,32 @@ const build_game_selection_embed = async (): Promise<{
 }> => {
   try {
     const game_list            = await get_game_list();
-    const select_menu          = new StringSelectMenuBuilder();
-
-    select_menu.setCustomId('catalog_select_game');
-    select_menu.setPlaceholder('Select a game category');
 
     const options              = game_list.map((game) => ({
-      label     : game.name,
-      value     : game.game_id,
+      label      : game.name,
+      value      : game.game_id,
       description: game.vendors.length > 0
         ? `${game.vendors.length} vendors available`
         : 'No vendors available'
     }));
 
-    select_menu.addOptions(options.slice(0, __max_display_items));
+    const component            = create_select_menu_v2(
+      'catalog_select_game',
+      'Select a game category',
+      options.slice(0, __max_display_items)
+    );
 
-    const row                  = new ActionRowBuilder<StringSelectMenuBuilder>();
-    row.addComponents(select_menu);
-
-    const embed                = new EmbedBuilder();
-
-    embed.setColor(__embed_color);
-    embed.setTitle('Game Catalog');
-    embed.setDescription('Please select a game category to view available vendors:');
-    embed.setTimestamp();
+    const embed                = create_embed_v2(
+      'Game Catalog',
+      'Please select a game category to view available vendors:',
+      __embed_color
+    );
 
     console.log('[ - CATALOG_CONTROLLER - ] Game selection embed built successfully');
 
     return {
       embed    : embed,
-      component: row
+      component: component
     };
   } catch (error) {
     await log_error(error);
@@ -85,10 +81,6 @@ const build_vendor_selection_embed = async (game_id: string): Promise<{
 }> => {
   try {
     const vendor_list         = await get_vendor_detail_by_game_id(game_id);
-    const select_menu         = new StringSelectMenuBuilder();
-
-    select_menu.setCustomId(`catalog_select_vendor:${game_id}`);
-    select_menu.setPlaceholder('Select a vendor');
 
     const options             = vendor_list.map((vendor) => {
       const stock_emoji       = vendor.stock_status === 'available'
@@ -98,29 +90,29 @@ const build_vendor_selection_embed = async (game_id: string): Promise<{
           : '<:stock_preorder:1234567892>';
 
       return {
-        label     : vendor.name,
-        value     : vendor.name,
+        label      : vendor.name,
+        value      : vendor.name,
         description: `$${vendor.price} - ${vendor.stock_status.replace('_', ' ')} ${stock_emoji}`
       };
     });
 
-    select_menu.addOptions(options.slice(0, __max_display_items));
+    const component           = create_select_menu_v2(
+      `catalog_select_vendor:${game_id}`,
+      'Select a vendor',
+      options.slice(0, __max_display_items)
+    );
 
-    const row                 = new ActionRowBuilder<StringSelectMenuBuilder>();
-    row.addComponents(select_menu);
-
-    const embed               = new EmbedBuilder();
-
-    embed.setColor(__embed_color);
-    embed.setTitle('Available Vendors');
-    embed.setDescription('Please select a vendor to view product details:');
-    embed.setTimestamp();
+    const embed               = create_embed_v2(
+      'Available Vendors',
+      'Please select a vendor to view product details:',
+      __embed_color
+    );
 
     console.log(`[ - CATALOG_CONTROLLER - ] Vendor selection embed built for game: ${game_id}`);
 
     return {
       embed    : embed,
-      component: row
+      component: component
     };
   } catch (error) {
     await log_error(error);
@@ -155,45 +147,45 @@ const build_vendor_detail_embed = async (game_id: string, vendor_name: string): 
       ? vendor.features_list.map((feature, index) => `${index + 1}. ${feature}`).join('\n')
       : 'No features listed';
 
-    const embed              = new EmbedBuilder();
-
-    embed.setColor(__embed_color);
-    embed.setTitle(`${vendor.name} - Product Details`);
-    embed.addFields(
+    const fields             = [
       {
-        name     : 'Price',
-        value    : `$${vendor.price}`,
-        inline   : true
+        name  : 'Price',
+        value : `$${vendor.price}`,
+        inline: true
       },
       {
-        name     : 'Stock Status',
-        value    : `${vendor.stock_status.replace('_', ' ')} ${stock_emoji}`,
-        inline   : true
+        name  : 'Stock Status',
+        value : `${vendor.stock_status.replace('_', ' ')} ${stock_emoji}`,
+        inline: true
       },
       {
-        name     : 'Features',
-        value    : features_text,
-        inline   : false
+        name  : 'Features',
+        value : features_text,
+        inline: false
       }
+    ];
+
+    const embed              = create_embed_v2(
+      `${vendor.name} - Product Details`,
+      '',
+      __embed_color,
+      fields
     );
-    embed.setTimestamp();
+
     embed.setFooter({ text: 'Click the button below to purchase' });
 
-    const row                = new ActionRowBuilder<ButtonBuilder>();
-    const buy_button         = new ButtonBuilder();
-
-    buy_button.setLabel('Buy Now');
-    buy_button.setStyle(ButtonStyle.Link);
-    buy_button.setURL('https://discord.gg/ticket-channel-dummy');
-    buy_button.setEmoji('<:cart:1234567893>');
-
-    row.addComponents(buy_button);
+    const component          = create_button_v2(
+      'Buy Now',
+      ButtonStyle.Link,
+      'https://discord.gg/ticket-channel-dummy',
+      '<:cart:1234567893>'
+    );
 
     console.log(`[ - CATALOG_CONTROLLER - ] Vendor detail embed built for: ${vendor_name}`);
 
     return {
       embed    : embed,
-      component: row
+      component: component
     };
   } catch (error) {
     await log_error(error);
