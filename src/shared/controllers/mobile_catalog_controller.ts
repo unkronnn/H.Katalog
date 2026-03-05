@@ -20,7 +20,8 @@ import {
   action_row,
   link_button,
   select_menu,
-  build_message
+  build_message,
+  convert_to_discord_format
 }                                     from '../../utils/components';
 import {
   get_dummy_vendors_by_game,
@@ -164,48 +165,51 @@ const build_mobile_catalog_embed = async (): Promise<{
       game_list_parts.push(`${game.emoji} **${game.game_name}** - ${game.description}`);
     }
 
-    // - CREATE COMPONENTS WITH NEW SYSTEM - \\
+    // - CREATE MESSAGE WITH NEW PATTERN - \\
 
-    const message              = build_message([
-      container(
-        section(
-          [
-            `## ${__game_emoji_map.mobile_legends} Mobile Games Catalog`
-          ],
-          'https://ui.shadcn.com/favicon.ico'
-        ),
-        text(['']),
-        text([
-          ...game_list_parts
-        ]),
-        text(['']),
-        text(['']),
-        text([
-          '**How to Order**',
-          '',
-          '1. Select a game from the dropdown menu',
-          '2. Choose an available vendor',
-          '3. Click "Buy Now" button to purchase',
-          '',
-          '*Powered by shadcn/ui*'
-        ]),
-        action_row(
-          select_menu(
-            'mobile_catalog_select_game',
-            'Select a mobile game to view catalog',
-            options.slice(0, __max_display_items)
-          )
-        )
-      )
-    ]);
+    const message              = build_message({
+      components: [
+        container({
+          components: [
+            section(
+              [
+                `## ${__game_emoji_map.mobile_legends} Mobile Games Catalog`
+              ],
+              'https://ui.shadcn.com/favicon.ico'
+            ),
+            divider(2),
+            text([
+              ...game_list_parts
+            ]),
+            divider(2),
+            text([
+              '**How to Order**',
+              '',
+              '1. Select a game from the dropdown menu',
+              '2. Choose an available vendor',
+              '3. Click "Buy Now" button to purchase',
+              '',
+              '*Powered by shadcn/ui*'
+            ]),
+            action_row(
+              select_menu(
+                'mobile_catalog_select_game',
+                'Select a mobile game to view catalog',
+                options.slice(0, __max_display_items)
+              )
+            )
+          ]
+        })
+      ]
+    });
 
     // - CONVERT TO DISCORD FORMAT - \\
 
+    const discord_format       = convert_to_discord_format(message);
     const embed                = new EmbedBuilder();
-    if (message.embeds[0]) {
-      const embed_data         = message.embeds[0];
 
-      // - MANUALLY SET EMBED PROPERTIES - \\
+    if (discord_format.embeds[0]) {
+      const embed_data         = discord_format.embeds[0];
 
       if (embed_data.title) {
         embed.setTitle(embed_data.title);
@@ -214,8 +218,6 @@ const build_mobile_catalog_embed = async (): Promise<{
       if (embed_data.description) {
         embed.setDescription(embed_data.description);
       }
-
-      // - ENSURE DESCRIPTION EXISTS - \\
 
       if (!embed.data.description) {
         embed.setDescription(' ');
@@ -238,7 +240,7 @@ const build_mobile_catalog_embed = async (): Promise<{
       }
     }
 
-    const component            = message.components[0] as ActionRowBuilder<StringSelectMenuBuilder>;
+    const component            = discord_format.components[0] as ActionRowBuilder<StringSelectMenuBuilder>;
 
     console.log('[ - MOBILE_CATALOG_CONTROLLER - ] Mobile catalog embed built successfully');
 
@@ -288,39 +290,44 @@ const build_mobile_vendor_selection_embed = async (game_id: string): Promise<{
       };
     });
 
-    // - BUILD COMPONENTS WITH NEW SYSTEM - \\
+    // - BUILD MESSAGE WITH NEW PATTERN - \\
 
-    const message              = build_message([
-      container(
-        section(
-          [
-            `## ${selected_game.emoji} ${selected_game.game_name} - Vendors`
-          ],
-          'https://ui.shadcn.com/favicon.ico'
-        ),
-        text(['']),
-        text(['']),
-        text([
-          'Please select a vendor to view product details:',
-          '',
-          '',
-          '*Powered by shadcn/ui*'
-        ]),
-        action_row(
-          select_menu(
-            `mobile_catalog_select_vendor:${game_id}`,
-            'Select a vendor to view details',
-            options.slice(0, __max_display_items)
-          )
-        )
-      )
-    ]);
+    const message              = build_message({
+      components: [
+        container({
+          components: [
+            section(
+              [
+                `## ${selected_game.emoji} ${selected_game.game_name} - Vendors`
+              ],
+              'https://ui.shadcn.com/favicon.ico'
+            ),
+            divider(2),
+            text([
+              'Please select a vendor to view product details:',
+              '',
+              '',
+              '*Powered by shadcn/ui*'
+            ]),
+            action_row(
+              select_menu(
+                `mobile_catalog_select_vendor:${game_id}`,
+                'Select a vendor to view details',
+                options.slice(0, __max_display_items)
+              )
+            )
+          ]
+        })
+      ]
+    });
 
     // - CONVERT TO DISCORD FORMAT - \\
 
+    const discord_format       = convert_to_discord_format(message);
     const embed                = new EmbedBuilder();
-    if (message.embeds[0]) {
-      const embed_data         = message.embeds[0];
+
+    if (discord_format.embeds[0]) {
+      const embed_data         = discord_format.embeds[0];
 
       if (embed_data.title) {
         embed.setTitle(embed_data.title);
@@ -351,7 +358,7 @@ const build_mobile_vendor_selection_embed = async (game_id: string): Promise<{
       }
     }
 
-    const component            = message.components[0] as ActionRowBuilder<StringSelectMenuBuilder>;
+    const component            = discord_format.components[0] as ActionRowBuilder<StringSelectMenuBuilder>;
 
     console.log(`[ - MOBILE_CATALOG_CONTROLLER - ] Vendor selection embed built for game: ${game_id}`);
 
@@ -410,40 +417,46 @@ const build_mobile_vendor_detail_embed = async (game_id: string, vendor_name: st
       ? vendor.features_list.map((feature, index) => `${index + 1}. ${feature}`).join('\n')
       : 'No features listed';
 
-    // - BUILD COMPONENTS WITH NEW SYSTEM - \\
+    // - BUILD MESSAGE WITH NEW PATTERN - \\
 
-    const message            = build_message([
-      container(
-        section(
-          [
-            `## ${selected_game.emoji} ${vendor.name}`
-          ],
-          'https://ui.shadcn.com/favicon.ico'
-        ),
-        text(['']),
-        text([
-          vendor.description || '',
-          '',
-          `**Price:** \`$${vendor.price}\``,
-          `**Stock:** ${vendor.stock_status.replace('_', ' ')} ${stock_emoji}`,
-          '',
-          '**Features:**',
-          features_text,
-          '',
-          '',
-          '*Click the button below to purchase*'
-        ]),
-        action_row(
-          link_button('Buy Now', 'https://discord.gg/ticket-channel-dummy')
-        )
-      )
-    ]);
+    const message            = build_message({
+      components: [
+        container({
+          components: [
+            section(
+              [
+                `## ${selected_game.emoji} ${vendor.name}`
+              ],
+              'https://ui.shadcn.com/favicon.ico'
+            ),
+            divider(2),
+            text([
+              vendor.description || '',
+              '',
+              `**Price:** \`$${vendor.price}\``,
+              `**Stock:** ${vendor.stock_status.replace('_', ' ')} ${stock_emoji}`,
+              '',
+              '**Features:**',
+              features_text,
+              '',
+              '',
+              '*Click the button below to purchase*'
+            ]),
+            action_row(
+              link_button('Buy Now', 'https://discord.gg/ticket-channel-dummy')
+            )
+          ]
+        })
+      ]
+    });
 
     // - CONVERT TO DISCORD FORMAT - \\
 
+    const discord_format     = convert_to_discord_format(message);
     const embed              = new EmbedBuilder();
-    if (message.embeds[0]) {
-      const embed_data       = message.embeds[0];
+
+    if (discord_format.embeds[0]) {
+      const embed_data       = discord_format.embeds[0];
 
       if (embed_data.title) {
         embed.setTitle(embed_data.title);
@@ -474,7 +487,7 @@ const build_mobile_vendor_detail_embed = async (game_id: string, vendor_name: st
       }
     }
 
-    const component          = message.components[0] as ActionRowBuilder<ButtonBuilder>;
+    const component          = discord_format.components[0] as ActionRowBuilder<ButtonBuilder>;
 
     console.log(`[ - MOBILE_CATALOG_CONTROLLER - ] Vendor detail embed built for: ${vendor_name}`);
 

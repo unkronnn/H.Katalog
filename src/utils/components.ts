@@ -9,42 +9,28 @@ import {
 
 // - COMPONENT INTERFACES - \\
 
-interface component_container {
-  type       : 'container';
+interface container_component {
   components : any[];
 }
 
-interface component_text {
-  type : 'text';
-  text : string | string[];
+interface text_component {
+  content : string | string[];
 }
 
-interface component_divider {
-  type: 'divider';
+interface divider_component {
+  lines : number;
 }
 
-interface component_section {
-  type     : 'section';
-  content  : string[];
+interface section_component {
+  content   : string[];
   thumbnail?: string;
 }
 
-interface component_action_row {
-  type : 'action_row';
-  component: any;
+interface action_row_component {
+  components : any[];
 }
 
-interface component_button {
-  type : 'button';
-  label: string;
-  style: 'primary' | 'secondary' | 'success' | 'danger' | 'link';
-  id?  : string;
-  url? : string;
-  emoji?: string;
-}
-
-interface component_select_menu {
-  type       : 'select_menu';
+interface select_menu_component {
   custom_id  : string;
   placeholder: string;
   options    : Array<{
@@ -55,55 +41,47 @@ interface component_select_menu {
   }>;
 }
 
+interface button_component {
+  label : string;
+  id    ?: string;
+  url   ?: string;
+  style ?: 'primary' | 'secondary' | 'success' | 'danger' | 'link';
+}
+
 interface message_components {
-  embeds    : APIEmbed[];
-  components: any[];
+  components: container_component[];
 }
 
 // - COMPONENT BUILDERS - \\
 
 /**
  * Create container component
- * @param components any[]
- * @return component_container
+ * @param config container_component
+ * @return container_component
  */
-const container = (...components: any[]): component_container => {
-  return {
-    type       : 'container',
-    components : components
-  };
+const container = (config: container_component): container_component => {
+  return config;
 };
 
 /**
  * Create text component
  * @param content string | string[]
- * @return component_text
+ * @return text_component
  */
-const text = (content: string | string[]): component_text => {
+const text = (content: string | string[]): text_component => {
   return {
-    type: 'text',
-    text: content
+    content: content
   };
 };
 
 /**
  * Create divider component
- * @return component_divider
+ * @param lines number
+ * @return divider_component
  */
-const divider = (): component_divider => {
+const divider = (lines: number = 1): divider_component => {
   return {
-    type: 'divider'
-  };
-};
-
-/**
- * Create full width divider component
- * @return component_text
- */
-const full_divider = (): component_text => {
-  return {
-    type: 'text',
-    text: '\u200B'
+    lines: lines
   };
 };
 
@@ -111,85 +89,68 @@ const full_divider = (): component_text => {
  * Create section component
  * @param content string[]
  * @param thumbnail string
- * @return component_section
+ * @return section_component
  */
-const section = (content: string[], thumbnail?: string): component_section => {
+const section = (content: string[], thumbnail?: string): section_component => {
   return {
-    type     : 'section',
     content  : content,
     thumbnail: thumbnail
   };
 };
 
 /**
- * Create action row component
- * @param component any
- * @return component_action_row
- */
-const action_row = (component: any): component_action_row => {
-  return {
-    type     : 'action_row',
-    component: component
-  };
-};
-
-/**
  * Create primary button component
  * @param label string
- * @param custom_id string
- * @return component_button
+ * @param id string
+ * @return button_component
  */
-const primary_button = (label: string, custom_id: string): component_button => {
+const primary_button = (label: string, id: string): button_component => {
   return {
-    type     : 'button',
-    label    : label,
-    style    : 'primary',
-    id       : custom_id
+    label: label,
+    style : 'primary',
+    id    : id
   };
 };
 
 /**
  * Create secondary button component
  * @param label string
- * @param custom_id string
- * @return component_button
+ * @param id string
+ * @return button_component
  */
-const secondary_button = (label: string, custom_id: string): component_button => {
+const secondary_button = (label: string, id: string): button_component => {
   return {
-    type     : 'button',
-    label    : label,
-    style    : 'secondary',
-    id       : custom_id
+    label: label,
+    style : 'secondary',
+    id    : id
   };
 };
 
 /**
  * Create success button component
  * @param label string
- * @param custom_id string
- * @return component_button
+ * @param id string
+ * @return button_component
  */
-const success_button = (label: string, custom_id: string): component_button => {
+const success_button = (label: string, id: string): button_component => {
   return {
-    type     : 'button',
-    label    : label,
-    style    : 'success',
-    id       : custom_id
+    label: label,
+    style : 'success',
+    id    : id
   };
 };
 
 /**
  * Create danger button component
  * @param label string
- * @param custom_id string
- * @return component_button
+ * @param id string
+ * @return button_component
  */
-const danger_button = (label: string, custom_id: string): component_button => {
+const danger_button = (label: string, id: string): button_component => {
   return {
-    type     : 'button',
-    label    : label,
-    style    : 'danger',
-    id       : custom_id
+    label: label,
+    style : 'danger',
+    id    : id
   };
 };
 
@@ -197,16 +158,13 @@ const danger_button = (label: string, custom_id: string): component_button => {
  * Create link button component
  * @param label string
  * @param url string
- * @param emoji string
- * @return component_button
+ * @return button_component
  */
-const link_button = (label: string, url: string, emoji?: string): component_button => {
+const link_button = (label: string, url: string): button_component => {
   return {
-    type     : 'button',
-    label    : label,
-    style    : 'link',
-    url      : url,
-    emoji    : emoji
+    label: label,
+    style : 'link',
+    url   : url
   };
 };
 
@@ -215,7 +173,7 @@ const link_button = (label: string, url: string, emoji?: string): component_butt
  * @param custom_id string
  * @param placeholder string
  * @param options Array<{label: string, value: string, description?: string, emoji?: string}>
- * @return component_select_menu
+ * @return select_menu_component
  */
 const select_menu = (
   custom_id  : string,
@@ -226,9 +184,8 @@ const select_menu = (
     description?: string;
     emoji?      : string;
   }>
-): component_select_menu => {
+): select_menu_component => {
   return {
-    type       : 'select_menu',
     custom_id  : custom_id,
     placeholder: placeholder,
     options    : options
@@ -236,19 +193,192 @@ const select_menu = (
 };
 
 /**
- * Build message from components
+ * Create action row component
  * @param components any[]
+ * @return action_row_component
+ */
+const action_row = (...components: any[]): action_row_component => {
+  return {
+    components: components
+  };
+};
+
+/**
+ * Build message from components
+ * @param config message_components
  * @return message_components
  */
-const build_message = (components: any[]): message_components => {
-  const embeds      : APIEmbed[] = [];
+const build_message = (config: message_components): message_components => {
+  return config;
+};
+
+/**
+ * Process container component to Discord format
+ * @param container container_component
+ * @return { embed: APIEmbed, components: any[] }
+ */
+const process_container = (container: container_component): {
+  embed     : APIEmbed;
+  components: any[];
+} => {
+  const embed        : any  = {};
+  const discord_components: any[] = [];
+  const parts        : string[] = [];
+
+  for (const item of container.components) {
+    // - HANDLE TEXT COMPONENT - \\
+
+    if ('content' in item) {
+      const content = (item as text_component).content;
+
+      if (content) {
+        if (Array.isArray(content)) {
+          parts.push(...content);
+        } else if (content.trim() !== '') {
+          parts.push(content);
+        }
+      }
+    }
+
+    // - HANDLE DIVIDER COMPONENT - \\
+
+    else if ('lines' in item) {
+      const lines = (item as divider_component).lines;
+      for (let i = 0; i < lines; i++) {
+        parts.push('');
+      }
+    }
+
+    // - HANDLE SECTION COMPONENT - \\
+
+    else if ('content' in item && 'thumbnail' in item) {
+      const section       = item as section_component;
+
+      if (section.content && section.content.length > 0) {
+        parts.push(...section.content);
+      }
+
+      if (section.thumbnail) {
+        embed.thumbnail = { url: section.thumbnail };
+      }
+    }
+
+    // - HANDLE ACTION ROW COMPONENT - \\
+
+    else if ('components' in item && Array.isArray((item as action_row_component).components)) {
+      const action_row_config = item as action_row_component;
+      const discord_component = build_action_row_from_config(action_row_config);
+
+      if (discord_component) {
+        discord_components.push(discord_component);
+      }
+    }
+  }
+
+  // - BUILD EMBED DESCRIPTION - \\
+
+  const description = parts.join('\n').trim();
+
+  if (!description || description === '') {
+    embed.description = ' ';
+  } else {
+    embed.description = description;
+  }
+
+  embed.timestamp = new Date().toISOString();
+
+  return {
+    embed     : embed,
+    components: discord_components
+  };
+};
+
+/**
+ * Build Discord action row from action_row config
+ * @param config action_row_component
+ * @return ActionRowBuilder<any> | null
+ */
+const build_action_row_from_config = (config: action_row_component): ActionRowBuilder<any> | null => {
+  const row = new ActionRowBuilder<any>();
+
+  for (const component_config of config.components) {
+    // - HANDLE BUTTON COMPONENT - \\
+
+    if ('label' in component_config && ('id' in component_config || 'url' in component_config)) {
+      const button_config = component_config as button_component;
+      const button        = new ButtonBuilder();
+
+      button.setLabel(button_config.label);
+
+      const style_map: Record<string, ButtonStyle> = {
+        primary  : ButtonStyle.Primary,
+        secondary: ButtonStyle.Secondary,
+        success  : ButtonStyle.Success,
+        danger   : ButtonStyle.Danger,
+        link     : ButtonStyle.Link
+      };
+
+      button.setStyle(style_map[button_config.style || 'secondary']);
+
+      if (button_config.id) {
+        button.setCustomId(button_config.id);
+      }
+
+      if (button_config.url) {
+        button.setURL(button_config.url);
+      }
+
+      row.addComponents(button);
+    }
+
+    // - HANDLE SELECT MENU COMPONENT - \\
+
+    else if ('custom_id' in component_config && 'options' in component_config) {
+      const select_config = component_config as select_menu_component;
+      const select        = new StringSelectMenuBuilder();
+
+      select.setCustomId(select_config.custom_id);
+      select.setPlaceholder(select_config.placeholder);
+
+      select.addOptions(
+        select_config.options.map((opt) => ({
+          label     : opt.label,
+          value     : opt.value,
+          description: opt.description || undefined,
+          emoji     : opt.emoji || undefined
+        }))
+      );
+
+      row.addComponents(select);
+    }
+  }
+
+  return row;
+};
+
+// - CONVERT TO DISCORD FORMAT - \\
+
+/**
+ * Convert message components to Discord format
+ * @param message message_components
+ * @return { embeds: APIEmbed[], components: any[] }
+ */
+const convert_to_discord_format = (message: message_components): {
+  embeds    : APIEmbed[];
+  components: any[];
+} => {
+  const embeds        : APIEmbed[] = [];
   const discord_components: any[] = [];
 
-  for (const component of components) {
-    if (component.type === 'container') {
-      const result = process_container(component);
-      if (result.embed) embeds.push(result.embed);
-      if (result.components) discord_components.push(...result.components);
+  for (const container_config of message.components) {
+    const result = process_container(container_config);
+
+    if (result.embed) {
+      embeds.push(result.embed);
+    }
+
+    if (result.components) {
+      discord_components.push(...result.components);
     }
   }
 
@@ -256,132 +386,6 @@ const build_message = (components: any[]): message_components => {
     embeds    : embeds,
     components: discord_components
   };
-};
-
-/**
- * Process container component
- * @param container component_container
- * @return { embed: APIEmbed, components: any[] }
- */
-const process_container = (container: component_container): {
-  embed     : APIEmbed;
-  components: any[];
-} => {
-  const embed   : any  = {};
-  const components: any[] = [];
-  const parts   : string[] = [];
-
-  for (const item of container.components) {
-    if (item.type === 'text') {
-      if (item.text) {
-        // - HANDLE ARRAY OR STRING TEXT - \\
-
-        if (Array.isArray(item.text)) {
-          parts.push(...item.text);
-        } else if (item.text.trim() !== '') {
-          parts.push(item.text);
-        }
-      }
-    } else if (item.type === 'divider') {
-      parts.push('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    } else if (item.type === 'section') {
-      // - HANDLE SECTION WITH THUMBNAIL - \\
-
-      if (item.content && item.content.length > 0) {
-        parts.push(...item.content);
-      }
-    } else if (item.type === 'action_row') {
-      const discord_component = build_action_row(item.component);
-      if (discord_component) {
-        components.push(discord_component);
-      }
-    }
-  }
-
-  const description = parts.join('\n').trim();
-
-  // - ENSURE DESCRIPTION IS NEVER EMPTY - \\
-
-  if (!description || description === '') {
-    embed.description = ' '; // Unicode space (em space) - required by Discord
-  } else {
-    embed.description = description;
-  }
-
-  embed.timestamp = new Date().toISOString();
-
-  // - HANDLE THUMBNAIL FROM SECTIONS - \\
-
-  for (const item of container.components) {
-    if (item.type === 'section' && item.thumbnail) {
-      embed.thumbnail = { url: item.thumbnail };
-      break;
-    }
-  }
-
-  return {
-    embed     : embed,
-    components: components
-  };
-};
-
-/**
- * Build Discord action row from component
- * @param component any
- * @return ActionRowBuilder<any> | null
- */
-const build_action_row = (component: any): ActionRowBuilder<any> | null => {
-  if (component.type === 'button') {
-    const button   = new ButtonBuilder();
-    button.setLabel(component.label);
-
-    const style_map: Record<string, ButtonStyle> = {
-      primary  : ButtonStyle.Primary,
-      secondary: ButtonStyle.Secondary,
-      success  : ButtonStyle.Success,
-      danger   : ButtonStyle.Danger,
-      link     : ButtonStyle.Link
-    };
-
-    button.setStyle(style_map[component.style]);
-
-    if (component.id) {
-      button.setCustomId(component.id);
-    }
-
-    if (component.url) {
-      button.setURL(component.url);
-    }
-
-    if (component.emoji) {
-      button.setEmoji(component.emoji);
-    }
-
-    const row = new ActionRowBuilder<any>();
-    row.addComponents(button);
-    return row;
-  }
-
-  if (component.type === 'select_menu') {
-    const select   = new StringSelectMenuBuilder();
-    select.setCustomId(component.custom_id);
-    select.setPlaceholder(component.placeholder);
-
-    select.addOptions(
-      component.options.map((opt: any) => ({
-        label     : opt.label,
-        value     : opt.value,
-        description: opt.description || undefined,
-        emoji     : opt.emoji || undefined
-      }))
-    );
-
-    const row = new ActionRowBuilder<any>();
-    row.addComponents(select);
-    return row;
-  }
-
-  return null;
 };
 
 // - LEGACY FUNCTIONS (Kept for backward compatibility) - \\
@@ -483,16 +487,16 @@ export {
   container,
   text,
   divider,
-  full_divider,
   section,
-  action_row,
   primary_button,
   secondary_button,
   success_button,
   danger_button,
   link_button,
   select_menu,
+  action_row,
   build_message,
+  convert_to_discord_format,
   create_embed_v2,
   create_select_menu_v2,
   create_button_v2
