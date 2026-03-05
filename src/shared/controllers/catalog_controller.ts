@@ -17,7 +17,7 @@ import { log_error }                   from '../../utils/error_logger';
 
 // - CONSTANTS - \\
 
-const __embed_color        = 0x2B2D31; // Discord dark gray transparant
+const __embed_color        = 0x09090b; // Shadcn original color
 const __max_display_items  = 25;
 
 // - EMBED BUILDERS - \\
