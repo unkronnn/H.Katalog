@@ -155,55 +155,50 @@ const build_mobile_catalog_embed = async (): Promise<{
       emoji      : game.emoji
     }));
 
-    const component            = create_select_menu_v2(
-      'mobile_catalog_select_game',
-      'Select a mobile game to view catalog',
-      options.slice(0, __max_display_items)
-    );
-
-    // - CREATE GAME LIST FOR EMBED - \\
+    // - BUILD GAME LIST TEXT - \\
 
     const game_list_parts      = [];
 
     for (const game of __mobile_games) {
       game_list_parts.push(`${game.emoji} **${game.game_name}**`);
-      game_list_parts.push(`> ${game.description}`);
+      game_list_parts.push(` ┃ ${game.description}`);
       game_list_parts.push('');
     }
 
     const game_list_text       = game_list_parts.join('\n');
 
-    // - CREATE EMBED WITH COMPONENT V2 - \\
+    // - CREATE COMPONENTS WITH NEW SYSTEM - \\
 
-    const fields               = [
-      {
-        name  : 'Available Games',
-        value : game_list_text.trim(),
-        inline: false
-      },
-      {
-        name  : 'How to Order',
-        value : '1. Select a game from the dropdown\n2. Choose an available vendor\n3. Click "Buy Now" button to purchase',
-        inline: false
-      }
-    ];
+    const message              = build_message([
+      container(
+        text(`# ${__game_emoji_map.mobile_legends} Mobile Games Catalog`),
+        text('Welcome to Mobile Games Catalog! Select a game to view available products.'),
+        text(''),
+        text('### 📱 Available Games'),
+        text('```' + game_list_text.trim() + '```'),
+        text(''),
+        text('### 📋 How to Order'),
+        text('1. Select a game from the dropdown\n2. Choose an available vendor\n3. Click "Buy Now" button to purchase'),
+        text(''),
+        text('*━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━*'),
+        action_row(
+          select_menu(
+            'mobile_catalog_select_game',
+            '🎮 Select a mobile game to view catalog',
+            options.slice(0, __max_display_items)
+          )
+        )
+      )
+    ]);
 
-    const embed                = create_embed_v2(
-      `${__game_emoji_map.mobile_legends} Mobile Games Catalog`,
-      'Welcome to Mobile Games Catalog! Select a game to view available products.',
-      __embed_color,
-      fields
-    );
+    // - CONVERT TO DISCORD FORMAT - \\
 
-    embed.setAuthor({
-      name: 'Mobile Catalog',
-      iconURL: 'https://ui.shadcn.com/favicon.ico'
-    });
+    const embed                = new EmbedBuilder();
+    if (message.embeds[0]) {
+      Object.assign(embed, message.embeds[0]);
+    }
 
-    embed.setFooter({
-      text: 'Powered by shadcn/ui',
-      iconURL: 'https://ui.shadcn.com/favicon.ico'
-    });
+    const component            = message.components[0] as ActionRowBuilder<StringSelectMenuBuilder>;
 
     console.log('[ - MOBILE_CATALOG_CONTROLLER - ] Mobile catalog embed built successfully');
 
@@ -253,17 +248,32 @@ const build_mobile_vendor_selection_embed = async (game_id: string): Promise<{
       };
     });
 
-    const component            = create_select_menu_v2(
-      `mobile_catalog_select_vendor:${game_id}`,
-      'Select a vendor to view details',
-      options.slice(0, __max_display_items)
-    );
+    // - BUILD COMPONENTS WITH NEW SYSTEM - \\
 
-    const embed                = create_embed_v2(
-      `${selected_game.emoji} ${selected_game.game_name} - Vendors`,
-      'Select a vendor to view product details:',
-      __embed_color
-    );
+    const message              = build_message([
+      container(
+        text(`# ${selected_game.emoji} ${selected_game.game_name} - Vendors`),
+        text('Select a vendor to view product details:'),
+        text(''),
+        text('*━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━*'),
+        action_row(
+          select_menu(
+            `mobile_catalog_select_vendor:${game_id}`,
+            '🛒 Select a vendor to view details',
+            options.slice(0, __max_display_items)
+          )
+        )
+      )
+    ]);
+
+    // - CONVERT TO DISCORD FORMAT - \\
+
+    const embed                = new EmbedBuilder();
+    if (message.embeds[0]) {
+      Object.assign(embed, message.embeds[0]);
+    }
+
+    const component            = message.components[0] as ActionRowBuilder<StringSelectMenuBuilder>;
 
     console.log(`[ - MOBILE_CATALOG_CONTROLLER - ] Vendor selection embed built for game: ${game_id}`);
 
@@ -322,46 +332,36 @@ const build_mobile_vendor_detail_embed = async (game_id: string, vendor_name: st
       ? vendor.features_list.map((feature, index) => `${index + 1}. ${feature}`).join('\n')
       : 'No features listed';
 
-    const fields             = [
-      {
-        name  : 'Price',
-        value : `$${vendor.price}`,
-        inline: true
-      },
-      {
-        name  : 'Stock Status',
-        value : `${vendor.stock_status.replace('_', ' ')} ${stock_emoji}`,
-        inline: true
-      },
-      {
-        name  : 'Game',
-        value : selected_game.game_name,
-        inline: true
-      },
-      {
-        name  : 'Features',
-        value : features_text,
-        inline: false
-      }
-    ];
+    // - BUILD COMPONENTS WITH NEW SYSTEM - \\
 
-    const embed              = create_embed_v2(
-      `${selected_game.emoji} ${vendor.name} - Product Details`,
-      vendor.description || '',
-      __embed_color,
-      fields
-    );
+    const message            = build_message([
+      container(
+        text(`# ${selected_game.emoji} ${vendor.name}`),
+        text(vendor.description || ''),
+        text(''),
+        text('### 💰 Product Details'),
+        text(`**Price:** \`$${vendor.price}\``),
+        text(`**Stock:** ${vendor.stock_status.replace('_', ' ')} ${stock_emoji}`),
+        text(`**Game:** ${selected_game.game_name}`),
+        text(''),
+        text('### ✨ Features'),
+        text(features_text),
+        text(''),
+        text('*━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━*'),
+        action_row(
+          link_button('🛒 Buy Now', 'https://discord.gg/ticket-channel-dummy', '🛒')
+        )
+      )
+    ]);
 
-    embed.setFooter({
-      text: 'Click the button below to purchase'
-    });
+    // - CONVERT TO DISCORD FORMAT - \\
 
-    const component          = create_button_v2(
-      'Buy Now',
-      ButtonStyle.Link,
-      'https://discord.gg/ticket-channel-dummy',
-      '🛒'
-    );
+    const embed              = new EmbedBuilder();
+    if (message.embeds[0]) {
+      Object.assign(embed, message.embeds[0]);
+    }
+
+    const component          = message.components[0] as ActionRowBuilder<ButtonBuilder>;
 
     console.log(`[ - MOBILE_CATALOG_CONTROLLER - ] Vendor detail embed built for: ${vendor_name}`);
 
