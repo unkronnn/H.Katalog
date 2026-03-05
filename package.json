@@ -1,0 +1,30 @@
+{
+  "name": "catalog-bot",
+  "version": "1.0.0",
+  "description": "Discord bot with AutoBuy Catalog feature",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "register": "ts-node src/scripts/register_commands.ts"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "catalog"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^14.14.1",
+    "dotenv": "^16.3.1",
+    "mongodb": "^7.1.0",
+    "mysql2": "^3.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}
