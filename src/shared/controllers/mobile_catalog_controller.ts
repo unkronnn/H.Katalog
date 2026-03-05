@@ -160,9 +160,7 @@ const build_mobile_catalog_embed = async (): Promise<{
     const game_list_parts      = [];
 
     for (const game of __mobile_games) {
-      game_list_parts.push(`${game.emoji} **${game.game_name}**`);
-      game_list_parts.push(` ┃ ${game.description}`);
-      game_list_parts.push('');
+      game_list_parts.push(`${game.emoji} **${game.game_name}** - ${game.description}`);
     }
 
     const game_list_text       = game_list_parts.join('\n');
@@ -172,19 +170,13 @@ const build_mobile_catalog_embed = async (): Promise<{
     const message              = build_message([
       container(
         text(`# ${__game_emoji_map.mobile_legends} Mobile Games Catalog`),
-        text('Welcome to Mobile Games Catalog! Select a game to view available products.'),
         text(''),
-        text('### 📱 Available Games'),
-        text('```' + game_list_text.trim() + '```'),
+        text(game_list_text),
         text(''),
-        text('### 📋 How to Order'),
-        text('1. Select a game from the dropdown\n2. Choose an available vendor\n3. Click "Buy Now" button to purchase'),
-        text(''),
-        text('*━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━*'),
         action_row(
           select_menu(
             'mobile_catalog_select_game',
-            '🎮 Select a mobile game to view catalog',
+            'Select a mobile game to view catalog',
             options.slice(0, __max_display_items)
           )
         )
@@ -285,13 +277,11 @@ const build_mobile_vendor_selection_embed = async (game_id: string): Promise<{
     const message              = build_message([
       container(
         text(`# ${selected_game.emoji} ${selected_game.game_name} - Vendors`),
-        text('Select a vendor to view product details:'),
         text(''),
-        text('*━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━*'),
         action_row(
           select_menu(
             `mobile_catalog_select_vendor:${game_id}`,
-            '🛒 Select a vendor to view details',
+            'Select a vendor to view details',
             options.slice(0, __max_display_items)
           )
         )
@@ -399,17 +389,14 @@ const build_mobile_vendor_detail_embed = async (game_id: string, vendor_name: st
         text(`# ${selected_game.emoji} ${vendor.name}`),
         text(vendor.description || ''),
         text(''),
-        text('### 💰 Product Details'),
         text(`**Price:** \`$${vendor.price}\``),
         text(`**Stock:** ${vendor.stock_status.replace('_', ' ')} ${stock_emoji}`),
-        text(`**Game:** ${selected_game.game_name}`),
         text(''),
-        text('### ✨ Features'),
+        text('**Features:**'),
         text(features_text),
         text(''),
-        text('*━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━*'),
         action_row(
-          link_button('🛒 Buy Now', 'https://discord.gg/ticket-channel-dummy', '🛒')
+          link_button('Buy Now', 'https://discord.gg/ticket-channel-dummy')
         )
       )
     ]);
