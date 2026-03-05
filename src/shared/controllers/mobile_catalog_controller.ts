@@ -16,6 +16,7 @@ import {
   container,
   text,
   divider,
+  section,
   action_row,
   link_button,
   select_menu,
@@ -163,16 +164,16 @@ const build_mobile_catalog_embed = async (): Promise<{
       game_list_parts.push(`${game.emoji} **${game.game_name}** - ${game.description}`);
     }
 
-    const game_list_text       = game_list_parts.join('\n');
-
     // - CREATE COMPONENTS WITH NEW SYSTEM - \\
 
     const message              = build_message([
       container(
-        text(`__${__game_emoji_map.mobile_legends} Mobile Games Catalog__`),
-        text(''),
-        text(game_list_text),
-        text(''),
+        text([
+          `__${__game_emoji_map.mobile_legends} Mobile Games Catalog__`,
+          '',
+          ...game_list_parts,
+          ''
+        ]),
         action_row(
           select_menu(
             'mobile_catalog_select_game',
@@ -276,8 +277,10 @@ const build_mobile_vendor_selection_embed = async (game_id: string): Promise<{
 
     const message              = build_message([
       container(
-        text(`__${selected_game.emoji} ${selected_game.game_name} - Vendors__`),
-        text(''),
+        text([
+          `__${selected_game.emoji} ${selected_game.game_name} - Vendors__`,
+          ''
+        ]),
         action_row(
           select_menu(
             `mobile_catalog_select_vendor:${game_id}`,
@@ -386,15 +389,17 @@ const build_mobile_vendor_detail_embed = async (game_id: string, vendor_name: st
 
     const message            = build_message([
       container(
-        text(`__${selected_game.emoji} ${vendor.name}__`),
-        text(vendor.description || ''),
-        text(''),
-        text(`**Price:** \`$${vendor.price}\``),
-        text(`**Stock:** ${vendor.stock_status.replace('_', ' ')} ${stock_emoji}`),
-        text(''),
-        text('**Features:**'),
-        text(features_text),
-        text(''),
+        text([
+          `__${selected_game.emoji} ${vendor.name}__`,
+          vendor.description || '',
+          '',
+          `**Price:** \`$${vendor.price}\``,
+          `**Stock:** ${vendor.stock_status.replace('_', ' ')} ${stock_emoji}`,
+          '',
+          '**Features:**',
+          features_text,
+          ''
+        ]),
         action_row(
           link_button('Buy Now', 'https://discord.gg/ticket-channel-dummy')
         )

@@ -16,11 +16,17 @@ interface component_container {
 
 interface component_text {
   type : 'text';
-  text : string;
+  text : string | string[];
 }
 
 interface component_divider {
   type: 'divider';
+}
+
+interface component_section {
+  type     : 'section';
+  content  : string[];
+  thumbnail?: string;
 }
 
 interface component_action_row {
@@ -70,10 +76,10 @@ const container = (...components: any[]): component_container => {
 
 /**
  * Create text component
- * @param text string
+ * @param content string | string[]
  * @return component_text
  */
-const text = (content: string): component_text => {
+const text = (content: string | string[]): component_text => {
   return {
     type: 'text',
     text: content
@@ -87,6 +93,20 @@ const text = (content: string): component_text => {
 const divider = (): component_divider => {
   return {
     type: 'divider'
+  };
+};
+
+/**
+ * Create section component
+ * @param content string[]
+ * @param thumbnail string
+ * @return component_section
+ */
+const section = (content: string[], thumbnail?: string): component_section => {
+  return {
+    type     : 'section',
+    content  : content,
+    thumbnail: thumbnail
   };
 };
 
@@ -243,10 +263,22 @@ const process_container = (container: component_container): {
   for (const item of container.components) {
     if (item.type === 'text') {
       if (item.text && item.text.trim() !== '') {
-        parts.push(item.text);
+        // - HANDLE ARRAY OR STRING TEXT - \\
+
+        if (Array.isArray(item.text)) {
+          parts.push(...item.text);
+        } else {
+          parts.push(item.text);
+        }
       }
     } else if (item.type === 'divider') {
       parts.push('─────────────────');
+    } else if (item.type === 'section') {
+      // - HANDLE SECTION WITH THUMBNAIL - \\
+
+      if (item.content && item.content.length > 0) {
+        parts.push(...item.content);
+      }
     } else if (item.type === 'action_row') {
       const discord_component = build_action_row(item.component);
       if (discord_component) {
@@ -266,6 +298,15 @@ const process_container = (container: component_container): {
   }
 
   embed.timestamp = new Date().toISOString();
+
+  // - HANDLE THUMBNAIL FROM SECTIONS - \\
+
+  for (const item of container.components) {
+    if (item.type === 'section' && item.thumbnail) {
+      embed.thumbnail = { url: item.thumbnail };
+      break;
+    }
+  }
 
   return {
     embed     : embed,
@@ -431,6 +472,7 @@ export {
   container,
   text,
   divider,
+  section,
   action_row,
   primary_button,
   secondary_button,
