@@ -205,7 +205,7 @@ const build_vendor_detail_embed = async (game_id: string, vendor_name: string): 
     const component          = create_button_v2(
       'Buy Now',
       ButtonStyle.Link,
-      'https://discord.gg/ticket-channel-dummy',
+      'https://discord.com/channels/1338437118296330292/1473664373980528640',
       '<:cart:1234567893>'
     );
 
