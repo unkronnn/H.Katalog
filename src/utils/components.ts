@@ -97,6 +97,17 @@ const divider = (): component_divider => {
 };
 
 /**
+ * Create full width divider component
+ * @return component_text
+ */
+const full_divider = (): component_text => {
+  return {
+    type: 'text',
+    text: '\u200B'
+  };
+};
+
+/**
  * Create section component
  * @param content string[]
  * @param thumbnail string
@@ -272,7 +283,7 @@ const process_container = (container: component_container): {
         }
       }
     } else if (item.type === 'divider') {
-      parts.push('─────────────────');
+      parts.push('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     } else if (item.type === 'section') {
       // - HANDLE SECTION WITH THUMBNAIL - \\
 
@@ -472,6 +483,7 @@ export {
   container,
   text,
   divider,
+  full_divider,
   section,
   action_row,
   primary_button,

@@ -174,15 +174,18 @@ const build_mobile_catalog_embed = async (): Promise<{
           ],
           'https://ui.shadcn.com/favicon.ico'
         ),
+        text(['']),
         divider(),
+        text(['']),
         text([
-          '',
-          ...game_list_parts,
-          ''
+          ...game_list_parts
         ]),
+        text(['']),
         divider(),
+        text(['']),
         text([
-          '### 📋 How to Order',
+          '**How to Order**',
+          '',
           '1. Select a game from the dropdown menu',
           '2. Choose an available vendor',
           '3. Click "Buy Now" button to purchase',
@@ -298,12 +301,15 @@ const build_mobile_vendor_selection_embed = async (game_id: string): Promise<{
           ],
           'https://ui.shadcn.com/favicon.ico'
         ),
+        text(['']),
         divider(),
+        text(['']),
         text([
-          'Please select a vendor to view product details:',
-          ''
+          'Please select a vendor to view product details:'
         ]),
+        text(['']),
         divider(),
+        text(['']),
         text([
           '*Powered by shadcn/ui*'
         ]),
@@ -421,7 +427,9 @@ const build_mobile_vendor_detail_embed = async (game_id: string, vendor_name: st
           ],
           'https://ui.shadcn.com/favicon.ico'
         ),
+        text(['']),
         divider(),
+        text(['']),
         text([
           vendor.description || '',
           '',
@@ -429,10 +437,11 @@ const build_mobile_vendor_detail_embed = async (game_id: string, vendor_name: st
           `**Stock:** ${vendor.stock_status.replace('_', ' ')} ${stock_emoji}`,
           '',
           '**Features:**',
-          features_text,
-          ''
+          features_text
         ]),
+        text(['']),
         divider(),
+        text(['']),
         text([
           '*Click the button below to purchase*'
         ]),
