@@ -1,62 +1,67 @@
-import { Pool }                     from 'mysql2/promise';
-import { initialize_database }      from '../services/catalog_service';
-import { log_error }                from '../utils/error_logger';
+import { MongoClient, Db }           from 'mongodb';
+import { log_error }                  from '../utils/error_logger';
 
 // - DATABASE CONFIGURATION - \\
 
-const __db_config     = {
-  host     : process.env.DB_HOST || 'localhost',
-  user     : process.env.DB_USER || 'root',
-  password : process.env.DB_PASSWORD || '',
-  database : process.env.DB_NAME || 'catalog_bot',
-  port     : Number(process.env.DB_PORT) || 3306
-};
+const __mongo_uri        = process.env.MONGO_URI || 'mongodb://localhost:27017';
+const __db_name          = process.env.DB_NAME || 'catalog_bot';
 
-const __pool_config   = {
-  connectionLimit : 10,
-  waitForConnections: true,
-  queueLimit      : 0
-};
-
-let __db_pool: Pool | null = null;
+let __mongo_client: MongoClient | null = null;
+let __database      : Db | null = null;
 
 /**
  * Initialize database connection
- * @return Promise<Pool>
+ * @return Promise<Db>
  */
-const setup_database = async (): Promise<Pool> => {
+const setup_database = async (): Promise<Db> => {
   try {
-    __db_pool               = new Pool({
-      host                  : __db_config.host,
-      user                  : __db_config.user,
-      password              : __db_config.password,
-      database              : __db_config.database,
-      port                  : __db_config.port,
-      connectionLimit       : __pool_config.connectionLimit,
-      waitForConnections    : __pool_config.waitForConnections,
-      queueLimit            : __pool_config.queueLimit
-    });
+    __mongo_client        = new MongoClient(__mongo_uri);
 
-    const connection        = await __db_pool.getConnection();
-    console.log('[ - DATABASE - ] Database connection established successfully');
-    connection.release();
+    await __mongo_client.connect();
 
-    initialize_database(__db_pool);
+    console.log('[ - DATABASE - ] MongoDB connection established successfully');
 
-    return __db_pool;
+    __database            = __mongo_client.db(__db_name);
+
+    // - CREATE INDEXES - \\
+    
+    await create_indexes(__database);
+
+    return __database;
   } catch (error) {
     await log_error(error);
-    console.log('[ - DATABASE - ] Failed to establish database connection');
+    console.log('[ - DATABASE - ] Failed to establish MongoDB connection');
     throw error;
   }
 };
 
 /**
- * Get database pool
- * @return Pool | null
+ * Create database indexes
+ * @param database Db
+ * @return Promise<void>
  */
-const get_database_pool = (): Pool | null => {
-  return __db_pool;
+const create_indexes = async (database: Db): Promise<void> => {
+  try {
+    const games_collection     = database.collection('games');
+    const vendors_collection   = database.collection('vendors');
+
+    await games_collection.createIndex({ game_id: 1 }, { unique: true });
+    await vendors_collection.createIndex({ game_id: 1, name: 1 });
+
+    console.log('[ - DATABASE - ] Database indexes created successfully');
+  } catch (error) {
+    await log_error(error);
+    console.log('[ - DATABASE - ] Failed to create indexes');
+    throw error;
+  }
+};
+
+/**
+ * Get database instance
+ * @return Db | null
+ */
+const get_database = (): Db | null => {
+  return __database;
 };
 
 /**
@@ -65,10 +70,11 @@ const get_database_pool = (): Pool | null => {
  */
 const close_database = async (): Promise<void> => {
   try {
-    if (__db_pool) {
-      await __db_pool.end();
-      console.log('[ - DATABASE - ] Database connection closed');
-      __db_pool = null;
+    if (__mongo_client) {
+      await __mongo_client.close();
+      console.log('[ - DATABASE - ] MongoDB connection closed');
+      __mongo_client = null;
+      __database     = null;
     }
   } catch (error) {
     await log_error(error);
@@ -80,6 +86,6 @@ const close_database = async (): Promise<void> => {
 
 export {
   setup_database,
-  get_database_pool,
+  get_database,
   close_database
 };
