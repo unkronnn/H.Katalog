@@ -127,7 +127,7 @@ const __mobile_games     : mobile_game[] = [
 
 // - CONSTANTS - \\
 
-const __embed_color        = 0x313338; // Discord transparant dark gray
+const __embed_color        = 0x2B2D31; // Discord transparant (no visible border)
 const __max_display_items  = 25;
 
 // - EMBED BUILDERS - \\
