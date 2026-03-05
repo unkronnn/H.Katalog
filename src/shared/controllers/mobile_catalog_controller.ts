@@ -5,10 +5,13 @@ import {
   EmbedBuilder,
   Interaction,
   StringSelectMenuBuilder,
-  StringSelectMenuInteraction,
-  ComponentType
+  StringSelectMenuInteraction
 }                                     from 'discord.js';
 import { log_error }                   from '../../utils/error_logger';
+import {
+  get_dummy_vendors_by_game,
+  get_dummy_vendor_detail
+}                                     from '../../data/mobile_catalog_dummy_data';
 
 // - GAME EMOJI MAPPINGS - \\
 
@@ -220,20 +223,9 @@ const build_mobile_vendor_selection_embed = async (game_id: string): Promise<{
       throw new Error(`Game not found: ${game_id}`);
     }
 
-    // - TODO: FETCH VENDORS FROM DATABASE - \\
+    // - FETCH VENDORS FROM DUMMY DATA - \\
 
-    const sample_vendors      = [
-      {
-        name        : 'Vendor A',
-        price       : 10.50,
-        stock_status: 'available'
-      },
-      {
-        name        : 'Vendor B',
-        price       : 9.99,
-        stock_status: 'available'
-      }
-    ];
+    const sample_vendors      = get_dummy_vendors_by_game(game_id);
 
     const select_menu         = new StringSelectMenuBuilder();
 
@@ -297,17 +289,20 @@ const build_mobile_vendor_detail_embed = async (game_id: string, vendor_name: st
       throw new Error(`Game not found: ${game_id}`);
     }
 
-    // - TODO: FETCH VENDOR DETAIL FROM DATABASE - \\
-    
+    // - FETCH VENDOR DETAIL FROM DUMMY DATA - \\
+
+    const vendor_data        = get_dummy_vendor_detail(game_id, vendor_name);
+
+    if (!vendor_data) {
+      throw new Error(`Vendor not found: ${vendor_name}`);
+    }
+
     const vendor              = {
-      name         : vendor_name,
-      price        : 10.50,
-      stock_status : 'available',
-      features_list: [
-        'Instant Delivery',
-        '24/7 Support',
-        '100% Legal'
-      ]
+      name         : vendor_data.name,
+      price        : vendor_data.price,
+      stock_status : vendor_data.stock_status,
+      features_list: vendor_data.features_list,
+      description  : vendor_data.description
     };
 
     const stock_emoji_map     = {
@@ -326,6 +321,11 @@ const build_mobile_vendor_detail_embed = async (game_id: string, vendor_name: st
 
     embed.setColor(__embed_color);
     embed.setTitle(`${selected_game.emoji} ${vendor.name} - Product Details`);
+
+    if (vendor.description) {
+      embed.setDescription(vendor.description);
+    }
+
     embed.addFields(
       {
         name     : 'Game',
