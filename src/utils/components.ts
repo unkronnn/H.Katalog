@@ -262,12 +262,12 @@ const process_container = (container: component_container): {
 
   for (const item of container.components) {
     if (item.type === 'text') {
-      if (item.text && item.text.trim() !== '') {
+      if (item.text) {
         // - HANDLE ARRAY OR STRING TEXT - \\
 
         if (Array.isArray(item.text)) {
           parts.push(...item.text);
-        } else {
+        } else if (item.text.trim() !== '') {
           parts.push(item.text);
         }
       }
