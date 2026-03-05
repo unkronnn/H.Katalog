@@ -14,10 +14,15 @@ import {
   get_vendor_detail_by_game_id
 }                                     from '../../services/catalog_service';
 import { log_error }                   from '../../utils/error_logger';
+import {
+  create_embed_v2,
+  create_select_menu_v2,
+  create_button_v2
+}                                     from '../../utils/components';
 
 // - CONSTANTS - \\
 
-const __embed_color        = 0x09090b; // Shadcn original color
+const __embed_color        = 0x313338; // Discord transparant dark gray
 const __max_display_items  = 25;
 
 // - EMBED BUILDERS - \\
