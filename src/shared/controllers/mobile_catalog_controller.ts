@@ -169,7 +169,7 @@ const build_mobile_catalog_embed = async (): Promise<{
 
     const message              = build_message([
       container(
-        text(`# ${__game_emoji_map.mobile_legends} Mobile Games Catalog`),
+        text(`__${__game_emoji_map.mobile_legends} Mobile Games Catalog__`),
         text(''),
         text(game_list_text),
         text(''),
@@ -276,7 +276,7 @@ const build_mobile_vendor_selection_embed = async (game_id: string): Promise<{
 
     const message              = build_message([
       container(
-        text(`# ${selected_game.emoji} ${selected_game.game_name} - Vendors`),
+        text(`__${selected_game.emoji} ${selected_game.game_name} - Vendors__`),
         text(''),
         action_row(
           select_menu(
@@ -386,7 +386,7 @@ const build_mobile_vendor_detail_embed = async (game_id: string, vendor_name: st
 
     const message            = build_message([
       container(
-        text(`# ${selected_game.emoji} ${vendor.name}`),
+        text(`__${selected_game.emoji} ${vendor.name}__`),
         text(vendor.description || ''),
         text(''),
         text(`**Price:** \`$${vendor.price}\``),
