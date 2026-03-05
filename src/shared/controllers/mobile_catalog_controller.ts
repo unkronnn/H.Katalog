@@ -5,7 +5,8 @@ import {
   EmbedBuilder,
   Interaction,
   StringSelectMenuBuilder,
-  StringSelectMenuInteraction
+  StringSelectMenuInteraction,
+  ComponentType
 }                                     from 'discord.js';
 import { log_error }                   from '../../utils/error_logger';
 
@@ -134,7 +135,7 @@ const build_mobile_catalog_embed = async (): Promise<{
     const select_menu          = new StringSelectMenuBuilder();
 
     select_menu.setCustomId('mobile_catalog_select_game');
-    select_menu.setPlaceholder('Select a mobile game');
+    select_menu.setPlaceholder('🎮 Pilih game mobile untuk melihat katalog');
 
     const options              = __mobile_games.map((game) => ({
       label     : game.game_name,
@@ -148,28 +149,48 @@ const build_mobile_catalog_embed = async (): Promise<{
     const row                  = new ActionRowBuilder<StringSelectMenuBuilder>();
     row.addComponents(select_menu);
 
-    // - CREATE CATALOG PANEL - \\
-
+    // - CREATE CATALOG PANEL WITH GAME LIST - \\
+    
     const embed                = new EmbedBuilder();
 
     embed.setColor(__embed_color);
-    embed.setTitle(`${__game_emoji_map.mobile_legends} Mobile Games Catalog`);
-    embed.setDescription('Pilih game mobile untuk melihat katalog produk yang tersedia:');
+    embed.setTitle(\`\${__game_emoji_map.mobile_legends} Mobile Games Catalog\`);
+    embed.setDescription('Selamat datang di Mobile Games Catalog! Pilih game untuk melihat katalog produk yang tersedia.');
+    
+    // - CREATE FORMATTED GAME LIST - \\
+    
+    const game_list_parts      = [];
+    
+    for (const game of __mobile_games) {
+      game_list_parts.push(\`\${game.emoji} **\${game.game_name}**\`);
+      game_list_parts.push(\`> \${game.description}\`);
+      game_list_parts.push(''); // Empty line for spacing
+    }
+    
+    const game_list_text       = game_list_parts.join('\\n');
+    
+    // - ADD FIELDS TO EMBED - \\
+    
+    embed.addFields(
+      {
+        name     : '📱 Available Games',
+        value    : game_list_text.trim(),
+        inline   : false
+      }
+    );
 
-    // - ADD GAME LIST TO EMBED - \\
-
-    const game_list_text       = __mobile_games.map((game) => {
-      return `${game.emoji} **${game.game_name}**\n   └ ${game.description}`;
-    }).join('\n\n');
-
-    embed.addFields({
-      name     : 'Available Games',
-      value    : game_list_text,
-      inline   : false
-    });
+    embed.addFields(
+      {
+        name     : '📋 Cara Order',
+        value    : '1️⃣ Pilih game dari dropdown di bawah\\n2️⃣ Pilih vendor yang tersedia\\n3️⃣ Klik tombol "Buy Now" untuk memesan',
+        inline   : false
+      }
+    );
 
     embed.setTimestamp();
-    embed.setFooter({ text: 'Select a game from the dropdown menu below' });
+    embed.setFooter({ 
+      text: 'Mobile Games Catalog | Powered by Discord Bot'
+    });
 
     console.log('[ - MOBILE_CATALOG_CONTROLLER - ] Mobile catalog embed built successfully');
 
@@ -196,11 +217,11 @@ const build_mobile_vendor_selection_embed = async (game_id: string): Promise<{
     const selected_game       = __mobile_games.find((game) => game.game_id === game_id);
 
     if (!selected_game) {
-      throw new Error(`Game not found: ${game_id}`);
+      throw new Error(\`Game not found: \${game_id}\`);
     }
 
     // - TODO: FETCH VENDORS FROM DATABASE - \\
-
+    
     const sample_vendors      = [
       {
         name        : 'Vendor A',
@@ -216,7 +237,7 @@ const build_mobile_vendor_selection_embed = async (game_id: string): Promise<{
 
     const select_menu         = new StringSelectMenuBuilder();
 
-    select_menu.setCustomId(`mobile_catalog_select_vendor:${game_id}`);
+    select_menu.setCustomId(\`mobile_catalog_select_vendor:\${game_id}\`);
     select_menu.setPlaceholder('Select a vendor');
 
     const stock_emoji_map     = {
@@ -231,7 +252,7 @@ const build_mobile_vendor_selection_embed = async (game_id: string): Promise<{
       return {
         label     : vendor.name,
         value     : vendor.name,
-        description: `$${vendor.price} - ${vendor.stock_status.replace('_', ' ')} ${stock_emoji}`
+        description: \`$\${vendor.price} - \${vendor.stock_status.replace('_', ' ')} \${stock_emoji}\`
       };
     });
 
@@ -243,11 +264,11 @@ const build_mobile_vendor_selection_embed = async (game_id: string): Promise<{
     const embed               = new EmbedBuilder();
 
     embed.setColor(__embed_color);
-    embed.setTitle(`${selected_game.emoji} ${selected_game.game_name} - Vendors`);
+    embed.setTitle(\`\${selected_game.emoji} \${selected_game.game_name} - Vendors\`);
     embed.setDescription('Silakan pilih vendor untuk melihat detail produk:');
     embed.setTimestamp();
 
-    console.log(`[ - MOBILE_CATALOG_CONTROLLER - ] Vendor selection embed built for game: ${game_id}`);
+    console.log(\`[ - MOBILE_CATALOG_CONTROLLER - ] Vendor selection embed built for game: \${game_id}\`);
 
     return {
       embed    : embed,
@@ -273,11 +294,11 @@ const build_mobile_vendor_detail_embed = async (game_id: string, vendor_name: st
     const selected_game       = __mobile_games.find((game) => game.game_id === game_id);
 
     if (!selected_game) {
-      throw new Error(`Game not found: ${game_id}`);
+      throw new Error(\`Game not found: \${game_id}\`);
     }
 
     // - TODO: FETCH VENDOR DETAIL FROM DATABASE - \\
-
+    
     const vendor              = {
       name         : vendor_name,
       price        : 10.50,
@@ -298,13 +319,13 @@ const build_mobile_vendor_detail_embed = async (game_id: string, vendor_name: st
     const stock_emoji        = stock_emoji_map[vendor.stock_status as keyof typeof stock_emoji_map] || '';
 
     const features_text      = vendor.features_list.length > 0
-      ? vendor.features_list.map((feature, index) => `${index + 1}. ${feature}`).join('\n')
+      ? vendor.features_list.map((feature, index) => \`\${index + 1}. \${feature}\`).join('\\n')
       : 'No features listed';
 
     const embed              = new EmbedBuilder();
 
     embed.setColor(__embed_color);
-    embed.setTitle(`${selected_game.emoji} ${vendor.name} - Product Details`);
+    embed.setTitle(\`\${selected_game.emoji} \${vendor.name} - Product Details\`);
     embed.addFields(
       {
         name     : 'Game',
@@ -313,12 +334,12 @@ const build_mobile_vendor_detail_embed = async (game_id: string, vendor_name: st
       },
       {
         name     : 'Price',
-        value    : `$${vendor.price}`,
+        value    : \`$\${vendor.price}\`,
         inline   : true
       },
       {
         name     : 'Stock Status',
-        value    : `${vendor.stock_status.replace('_', ' ')} ${stock_emoji}`,
+        value    : \`\${vendor.stock_status.replace('_', ' ')} \${stock_emoji}\`,
         inline   : true
       },
       {
@@ -340,7 +361,7 @@ const build_mobile_vendor_detail_embed = async (game_id: string, vendor_name: st
 
     row.addComponents(buy_button);
 
-    console.log(`[ - MOBILE_CATALOG_CONTROLLER - ] Vendor detail embed built for: ${vendor_name}`);
+    console.log(\`[ - MOBILE_CATALOG_CONTROLLER - ] Vendor detail embed built for: \${vendor_name}\`);
 
     return {
       embed    : embed,
@@ -364,12 +385,14 @@ const handle_mobile_game_selection = async (interaction: StringSelectMenuInterac
     const game_id             = interaction.values[0];
     const { embed, component } = await build_mobile_vendor_selection_embed(game_id);
 
-    await interaction.update({
+    // - EPHEMERAL - Hanya user yang bisa lihat
+    await interaction.reply({
       embeds    : [embed],
-      components: [component]
+      components : [component],
+      ephemeral   : true
     });
 
-    console.log(`[ - MOBILE_CATALOG_CONTROLLER - ] Mobile game selected: ${game_id}`);
+    console.log(\`[ - MOBILE_CATALOG_CONTROLLER - ] Mobile game selected: \${game_id}\`);
   } catch (error) {
     await log_error(error);
     throw error;
@@ -390,12 +413,13 @@ const handle_mobile_vendor_selection = async (
     const vendor_name        = interaction.values[0];
     const { embed, component } = await build_mobile_vendor_detail_embed(game_id, vendor_name);
 
+    // - EPHEMERAL - Update embed yang ephemeral
     await interaction.update({
       embeds    : [embed],
-      components: [component]
+      components : [component]
     });
 
-    console.log(`[ - MOBILE_CATALOG_CONTROLLER - ] Mobile vendor selected: ${vendor_name} for game: ${game_id}`);
+    console.log(\`[ - MOBILE_CATALOG_CONTROLLER - ] Mobile vendor selected: \${vendor_name} for game: \${game_id}\`);
   } catch (error) {
     await log_error(error);
     throw error;
@@ -428,7 +452,7 @@ const handle_mobile_catalog_interaction = async (interaction: Interaction): Prom
 };
 
 /**
- * Show mobile catalog
+ * Show mobile catalog (PERMANENT EMBED)
  * @param interaction Interaction
  * @return Promise<void>
  */
@@ -437,13 +461,14 @@ const show_mobile_catalog = async (interaction: Interaction): Promise<void> => {
     const { embed, component } = await build_mobile_catalog_embed();
 
     if (interaction.isRepliable()) {
+      // - PUBLIC PERMANENT EMBED - Semua user bisa lihat
       await interaction.reply({
         embeds     : [embed],
         components : [component],
         ephemeral  : false
       });
 
-      console.log('[ - MOBILE_CATALOG_CONTROLLER - ] Mobile catalog displayed successfully');
+      console.log('[ - MOBILE_CATALOG_CONTROLLER - ] Mobile catalog displayed successfully (permanent)');
     }
   } catch (error) {
     await log_error(error);
