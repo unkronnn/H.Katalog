@@ -22,7 +22,7 @@ import {
 
 // - CONSTANTS - \\
 
-const __embed_color        = 0x2B2D31; // Discord transparant (no visible border)
+const __embed_color        = null; // No color - shadcn minimal style
 const __max_display_items  = 25;
 
 // - EMBED BUILDERS - \\
@@ -57,6 +57,16 @@ const build_game_selection_embed = async (): Promise<{
       'Please select a game category to view available vendors:',
       __embed_color
     );
+
+    embed.setAuthor({
+      name: 'Game Catalog',
+      iconURL: 'https://ui.shadcn.com/favicon.ico'
+    });
+
+    embed.setFooter({
+      text: 'Powered by shadcn/ui',
+      iconURL: 'https://ui.shadcn.com/favicon.ico'
+    });
 
     console.log('[ - CATALOG_CONTROLLER - ] Game selection embed built successfully');
 
@@ -172,7 +182,9 @@ const build_vendor_detail_embed = async (game_id: string, vendor_name: string): 
       fields
     );
 
-    embed.setFooter({ text: 'Click the button below to purchase' });
+    embed.setFooter({
+      text: 'Click the button below to purchase'
+    });
 
     const component          = create_button_v2(
       'Buy Now',

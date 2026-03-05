@@ -127,7 +127,7 @@ const __mobile_games     : mobile_game[] = [
 
 // - CONSTANTS - \\
 
-const __embed_color        = 0x2B2D31; // Discord transparant (no visible border)
+const __embed_color        = null; // No color - shadcn minimal style
 const __max_display_items  = 25;
 
 // - EMBED BUILDERS - \\
@@ -188,7 +188,15 @@ const build_mobile_catalog_embed = async (): Promise<{
       fields
     );
 
-    embed.setFooter({ text: 'Mobile Games Catalog | Powered by Discord Bot' });
+    embed.setAuthor({
+      name: 'Mobile Catalog',
+      iconURL: 'https://ui.shadcn.com/favicon.ico'
+    });
+
+    embed.setFooter({
+      text: 'Powered by shadcn/ui',
+      iconURL: 'https://ui.shadcn.com/favicon.ico'
+    });
 
     console.log('[ - MOBILE_CATALOG_CONTROLLER - ] Mobile catalog embed built successfully');
 
@@ -337,7 +345,9 @@ const build_mobile_vendor_detail_embed = async (game_id: string, vendor_name: st
       fields
     );
 
-    embed.setFooter({ text: 'Click the button below to purchase' });
+    embed.setFooter({
+      text: 'Click the button below to purchase'
+    });
 
     const component          = create_button_v2(
       'Buy Now',

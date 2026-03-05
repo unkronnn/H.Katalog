@@ -12,19 +12,22 @@ import {
  * Create embed with Component V2 format
  * @param title string
  * @param description string
- * @param color number
+ * @param color number | null
  * @param fields Array<{name: string, value: string, inline: boolean}>
  * @return EmbedBuilder
  */
 const create_embed_v2 = (
   title      : string,
   description: string,
-  color      : number,
+  color      : number | null,
   fields?    : Array<{ name: string; value: string; inline: boolean }>
 ): EmbedBuilder => {
   const embed                   = new EmbedBuilder();
 
-  embed.setColor(color);
+  if (color !== null) {
+    embed.setColor(color);
+  }
+
   embed.setTitle(title);
   embed.setDescription(description);
 
