@@ -122,7 +122,7 @@ const __mobile_games     : mobile_game[] = [
 
 // - CONSTANTS - \\
 
-const __embed_color        = 0x09090b;
+const __embed_color        = 0x2B2D31; // Discord dark gray transparant
 const __max_display_items  = 25;
 
 // - EMBED BUILDERS - \\
@@ -159,7 +159,7 @@ const build_mobile_catalog_embed = async (): Promise<{
 
     embed.setColor(__embed_color);
     embed.setTitle(`${__game_emoji_map.mobile_legends} Mobile Games Catalog`);
-    embed.setDescription('Selamat datang di Mobile Games Catalog! Pilih game untuk melihat katalog produk yang tersedia.');
+    embed.setDescription(`>>> Selamat datang di Mobile Games Catalog! Pilih game untuk melihat katalog produk yang tersedia.`);
     
     // - CREATE FORMATTED GAME LIST - \\
     
@@ -186,7 +186,7 @@ const build_mobile_catalog_embed = async (): Promise<{
     embed.addFields(
       {
         name     : '📋 Cara Order',
-        value    : '1️⃣ Pilih game dari dropdown di bawah\n2️⃣ Pilih vendor yang tersedia\n3️⃣ Klik tombol "Buy Now" untuk memesan',
+        value    : '1️⃣ Pilih game dari dropdown\n2️⃣ Pilih vendor yang tersedia\n3️⃣ Klik tombol "Buy Now" untuk memesan',
         inline   : false
       }
     );
@@ -258,7 +258,7 @@ const build_mobile_vendor_selection_embed = async (game_id: string): Promise<{
 
     embed.setColor(__embed_color);
     embed.setTitle(`${selected_game.emoji} ${selected_game.game_name} - Vendors`);
-    embed.setDescription('Silakan pilih vendor untuk melihat detail produk:');
+    embed.setDescription(`>>> Silakan pilih vendor untuk melihat detail produk:`);
     embed.setTimestamp();
 
     console.log(`[ - MOBILE_CATALOG_CONTROLLER - ] Vendor selection embed built for game: ${game_id}`);
@@ -324,27 +324,27 @@ const build_mobile_vendor_detail_embed = async (game_id: string, vendor_name: st
     embed.setTitle(`${selected_game.emoji} ${vendor.name} - Product Details`);
 
     if (vendor.description) {
-      embed.setDescription(vendor.description);
+      embed.setDescription(`>>> ${vendor.description}`);
     }
 
     embed.addFields(
       {
-        name     : 'Game',
-        value    : selected_game.game_name,
-        inline   : true
-      },
-      {
-        name     : 'Price',
+        name     : '💰 Price',
         value    : `$${vendor.price}`,
         inline   : true
       },
       {
-        name     : 'Stock Status',
+        name     : '📦 Stock',
         value    : `${vendor.stock_status.replace('_', ' ')} ${stock_emoji}`,
         inline   : true
       },
       {
-        name     : 'Features',
+        name     : '🎮 Game',
+        value    : selected_game.game_name,
+        inline   : true
+      },
+      {
+        name     : '✨ Features',
         value    : features_text,
         inline   : false
       }
