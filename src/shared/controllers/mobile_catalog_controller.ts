@@ -168,11 +168,26 @@ const build_mobile_catalog_embed = async (): Promise<{
 
     const message              = build_message([
       container(
+        section(
+          [
+            `## ${__game_emoji_map.mobile_legends} Mobile Games Catalog`
+          ],
+          'https://ui.shadcn.com/favicon.ico'
+        ),
+        divider(),
         text([
-          `__${__game_emoji_map.mobile_legends} Mobile Games Catalog__`,
           '',
           ...game_list_parts,
           ''
+        ]),
+        divider(),
+        text([
+          '### 📋 How to Order',
+          '1. Select a game from the dropdown menu',
+          '2. Choose an available vendor',
+          '3. Click "Buy Now" button to purchase',
+          '',
+          '*Powered by shadcn/ui*'
         ]),
         action_row(
           select_menu(
@@ -277,9 +292,20 @@ const build_mobile_vendor_selection_embed = async (game_id: string): Promise<{
 
     const message              = build_message([
       container(
+        section(
+          [
+            `## ${selected_game.emoji} ${selected_game.game_name} - Vendors`
+          ],
+          'https://ui.shadcn.com/favicon.ico'
+        ),
+        divider(),
         text([
-          `__${selected_game.emoji} ${selected_game.game_name} - Vendors__`,
+          'Please select a vendor to view product details:',
           ''
+        ]),
+        divider(),
+        text([
+          '*Powered by shadcn/ui*'
         ]),
         action_row(
           select_menu(
@@ -389,8 +415,14 @@ const build_mobile_vendor_detail_embed = async (game_id: string, vendor_name: st
 
     const message            = build_message([
       container(
+        section(
+          [
+            `## ${selected_game.emoji} ${vendor.name}`
+          ],
+          'https://ui.shadcn.com/favicon.ico'
+        ),
+        divider(),
         text([
-          `__${selected_game.emoji} ${vendor.name}__`,
           vendor.description || '',
           '',
           `**Price:** \`$${vendor.price}\``,
@@ -399,6 +431,10 @@ const build_mobile_vendor_detail_embed = async (game_id: string, vendor_name: st
           '**Features:**',
           features_text,
           ''
+        ]),
+        divider(),
+        text([
+          '*Click the button below to purchase*'
         ]),
         action_row(
           link_button('Buy Now', 'https://discord.gg/ticket-channel-dummy')
