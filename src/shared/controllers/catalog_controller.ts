@@ -38,6 +38,10 @@ const build_game_selection_embed = async (): Promise<{
   try {
     const game_list            = await get_game_list();
 
+    if (!game_list || game_list.length === 0) {
+      throw new Error('No games available in catalog');
+    }
+
     const options              = game_list.map((game) => ({
       label      : game.name,
       value      : game.game_id,
@@ -45,6 +49,10 @@ const build_game_selection_embed = async (): Promise<{
         ? `${game.vendors.length} vendors available`
         : 'No vendors available'
     }));
+
+    if (options.length === 0) {
+      throw new Error('No valid game options available');
+    }
 
     const component            = create_select_menu_v2(
       'catalog_select_game',
@@ -92,6 +100,10 @@ const build_vendor_selection_embed = async (game_id: string): Promise<{
   try {
     const vendor_list         = await get_vendor_detail_by_game_id(game_id);
 
+    if (!vendor_list || vendor_list.length === 0) {
+      throw new Error(`No vendors available for game: ${game_id}`);
+    }
+
     const options             = vendor_list.map((vendor) => {
       const stock_emoji       = vendor.stock_status === 'available'
         ? '<:stock_available:1234567890>'
@@ -105,6 +117,10 @@ const build_vendor_selection_embed = async (game_id: string): Promise<{
         description: `$${vendor.price} - ${vendor.stock_status.replace('_', ' ')} ${stock_emoji}`
       };
     });
+
+    if (options.length === 0) {
+      throw new Error(`No valid vendor options for game: ${game_id}`);
+    }
 
     const component           = create_select_menu_v2(
       `catalog_select_vendor:${game_id}`,
