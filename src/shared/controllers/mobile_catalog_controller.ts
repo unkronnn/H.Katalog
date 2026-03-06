@@ -1,6 +1,7 @@
 import {
   Interaction,
   StringSelectMenuInteraction,
+  ButtonInteraction,
   EmbedBuilder,
   ActionRowBuilder,
   StringSelectMenuBuilder,
@@ -29,6 +30,16 @@ const __game_emoji_map    = {
   cross_fire          : '<:crossfire:1478924029976121364>',
   honor_of_kings      : '<:hok:1478924442381062174>',
   arena_of_valor      : '<:aovstorenew:1478924461888635053>'
+};
+
+// - PUBG MOBILE VENDOR EMOJI MAP - \\
+
+const __pubg_vendor_emoji_map: { [key: string]: string } = {
+  'TANTEDARA PLUGIN INDONESIA': '<:tantedara:1479381425961832500>',
+  'KING Android'             : '<:kingandroid:1479381392843604106>',
+  'SHIELD (Non Root)'        : '<:shield:1479381416054886531>',
+  'KING iOS'                 : '<:kingios:1479381376523567154>',
+  'OASIS iOS'                : '<:oasis:1479381403878690900>'
 };
 
 // - GAME DATA - \\
@@ -236,68 +247,66 @@ const build_mobile_vendor_selection_embed = async (game_id: string): Promise<{
 
     const vendors = get_dummy_vendors_by_game(game_id);
 
-    const stock_emoji_map = {
-      available   : '✓',
-      out_of_stock: '✗',
-      pre_order   : '◷'
-    };
+    // - BUILD VENDOR LIST WITH EMOJIS - \\
 
-    const options = vendors.map((vendor) => {
-      const stock_emoji = stock_emoji_map[vendor.stock_status as keyof typeof stock_emoji_map] || '•';
+    const vendor_list_parts = vendors.map((vendor) => {
+      const emoji = __pubg_vendor_emoji_map[vendor.name] || '🧀'; // Use cheese emoji if not found
+      return `${emoji} ${vendor.name}`;
+    });
 
-      // Handle both old (price) and new (pricing_options) format
-      let price_range: string;
+    // - CREATE EMBED WITH VENDOR LIST - \\
+
+    const embed = new EmbedBuilder()
+      .setColor(__embed_color)
+      .setTitle(`${selected_game.emoji} ${selected_game.game_name} - Select Vendor`)
+      .setThumbnail('https://ui.shadcn.com/favicon.ico')
+      .setDescription(
+        [
+          '**Available Vendors:**',
+          '',
+          ...vendor_list_parts,
+          '',
+          '*Select a vendor from the dropdown menu below to view details*'
+        ].join('\n')
+      )
+      .setTimestamp()
+      .setFooter({ text: 'Powered by shadcn/ui • H.Katalog Bot' });
+
+    // - CREATE SELECT MENU FOR VENDOR SELECTION - \\
+
+    const select_options = vendors.map((vendor) => {
+      const parsed_emoji = parse_custom_emoji(__pubg_vendor_emoji_map[vendor.name] || '🧀');
+
+      // Handle both old (price) and new (pricing_options) format for description
+      let description: string;
 
       if (vendor.pricing_options && vendor.pricing_options.length > 0) {
         // New format with pricing_options
         const prices = vendor.pricing_options.map(opt => opt.price);
         const min_price = Math.min(...prices);
         const max_price = Math.max(...prices);
-        price_range = min_price === max_price
+        description = min_price === max_price
           ? `Rp ${min_price.toLocaleString('id-ID')}`
           : `Rp ${min_price.toLocaleString('id-ID')} - Rp ${max_price.toLocaleString('id-ID')}`;
       } else if (vendor.price) {
         // Old format with single price
-        price_range = `Rp ${(vendor as any).price.toLocaleString('id-ID')}`;
+        description = `Rp ${(vendor as any).price.toLocaleString('id-ID')}`;
       } else {
-        price_range = 'Price not available';
+        description = 'Contact for pricing';
       }
 
       return {
-        label      : vendor.name,
-        value      : vendor.name,
-        description: `${price_range} - ${vendor.stock_status.replace('_', ' ')} ${stock_emoji}`
+        label     : vendor.name,
+        value     : `${vendor.name}::${vendors.indexOf(vendor)}`, // Include index for reference
+        description,
+        emoji     : parsed_emoji || undefined
       };
     });
-
-    // - CREATE EMBED WITH FIELDS (matching envy_bot style) - \\
-
-    const embed = new EmbedBuilder()
-      .setColor(__embed_color)
-      .setTitle(`${selected_game.emoji} ${selected_game.game_name} - Select Vendor`)
-      .setThumbnail('https://ui.shadcn.com/favicon.ico')
-      .setDescription('Please select a vendor from the dropdown menu below to view product details and purchase.')
-      .addFields(
-        {
-          name  : 'Available Vendors',
-          value : `${vendors.length} vendor(s) available`,
-          inline: true
-        },
-        {
-          name  : 'Stock Status',
-          value : '✓ Available | ✗ Out of Stock | ◷ Pre-Order',
-          inline: true
-        }
-      )
-      .setTimestamp()
-      .setFooter({ text: 'Powered by shadcn/ui • H.Katalog Bot' });
-
-    // - CREATE SELECT MENU COMPONENT - \\
 
     const select_menu = new StringSelectMenuBuilder()
       .setCustomId(`mobile_catalog_select_vendor:${game_id}`)
       .setPlaceholder('Select a vendor to view details')
-      .addOptions(options.slice(0, __max_display_items));
+      .addOptions(select_options.slice(0, __max_display_items));
 
     const row = new ActionRowBuilder<StringSelectMenuBuilder>()
       .addComponents(select_menu);
@@ -477,16 +486,15 @@ const handle_mobile_vendor_selection = async (
   game_id    : string
 ): Promise<void> => {
   try {
-    const vendor_name = interaction.values[0];
-    const { embed, component } = await build_mobile_vendor_detail_embed(game_id, vendor_name);
+    const vendor_value = interaction.values[0]; // Format: "vendor_name::index"
+    const { embed, component } = await build_mobile_vendor_detail_embed(game_id, vendor_value);
 
-    await interaction.reply({
+    await interaction.update({
       embeds: [embed],
-      components: [component],
-      ephemeral: true
+      components: [component]
     });
 
-    console.log(`[ - MOBILE_CATALOG_CONTROLLER - ] Mobile vendor selected: ${vendor_name} for game: ${game_id}`);
+    console.log(`[ - MOBILE_CATALOG_CONTROLLER - ] Mobile vendor selected: ${vendor_value} for game: ${game_id}`);
   } catch (error) {
     await log_error(error);
     throw error;
