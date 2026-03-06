@@ -258,19 +258,8 @@ const build_mobile_vendor_selection_embed = async (game_id: string): Promise<{
 
     const embed = new EmbedBuilder()
       .setColor(__embed_color)
-      .setTitle(`${selected_game.emoji} ${selected_game.game_name} - Select Vendor`)
-      .setThumbnail('https://ui.shadcn.com/favicon.ico')
-      .setDescription(
-        [
-          '**Available Vendors:**',
-          '',
-          ...vendor_list_parts,
-          '',
-          '*Select a vendor from the dropdown menu below to view details*'
-        ].join('\n')
-      )
-      .setTimestamp()
-      .setFooter({ text: 'Powered by shadcn/ui • H.Katalog Bot' });
+      .setTitle(`${selected_game.emoji} ${selected_game.game_name}`)
+      .setDescription(vendor_list_parts.join('\n'));
 
     // - CREATE SELECT MENU FOR VENDOR SELECTION - \\
 
