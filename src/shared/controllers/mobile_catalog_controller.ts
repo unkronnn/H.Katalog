@@ -241,13 +241,24 @@ const build_mobile_vendor_selection_embed = async (game_id: string): Promise<{
       pre_order   : '◷'
     };
 
-    const options = vendors.map((vendor) => {
+    const options = vendors.map((vendor, index) => {
       const stock_emoji = stock_emoji_map[vendor.stock_status as keyof typeof stock_emoji_map] || '•';
 
+      // Extract duration from description for unique label
+      const duration_match = (vendor.description || '').match(/(\d+ Day|Days)/);
+      const duration_text = duration_match ? duration_match[1] : '';
+
+      // Create unique label and value
+      const unique_label = duration_text
+        ? `${vendor.name} (${duration_text})`
+        : vendor.name;
+
+      const unique_value = `${vendor.name}::${index}`;
+
       return {
-        label      : vendor.name,
-        value      : vendor.name,
-        description: `$${vendor.price} - ${vendor.stock_status.replace('_', ' ')} ${stock_emoji}`
+        label      : unique_label,
+        value      : unique_value,
+        description: `Rp ${vendor.price.toLocaleString('id-ID')} - ${vendor.stock_status.replace('_', ' ')} ${stock_emoji}`
       };
     });
 
@@ -295,10 +306,10 @@ const build_mobile_vendor_selection_embed = async (game_id: string): Promise<{
 /**
  * Build vendor detail embed with purchase button
  * @param game_id string
- * @param vendor_name string
+ * @param vendor_value string - Format: "vendor_name" or "vendor_name::index"
  * @return Promise<{ embed: EmbedBuilder; component: ActionRowBuilder<ButtonBuilder> }>
  */
-const build_mobile_vendor_detail_embed = async (game_id: string, vendor_name: string): Promise<{
+const build_mobile_vendor_detail_embed = async (game_id: string, vendor_value: string): Promise<{
   embed: EmbedBuilder;
   component: ActionRowBuilder<ButtonBuilder>;
 }> => {
@@ -309,12 +320,23 @@ const build_mobile_vendor_detail_embed = async (game_id: string, vendor_name: st
       throw new Error(`Game not found: ${game_id}`);
     }
 
-    // - FETCH VENDOR DETAIL FROM DUMMY DATA - \\
+    // - PARSE VENDOR VALUE (handle "name::index" format) - \\
 
-    const vendor_data = get_dummy_vendor_detail(game_id, vendor_name);
+    let vendor_data;
+
+    if (vendor_value.includes('::')) {
+      // New format: "name::index"
+      const [name, index_str] = vendor_value.split('::');
+      const index = parseInt(index_str, 10);
+      const vendors = get_dummy_vendors_by_game(game_id);
+      vendor_data = vendors[index];
+    } else {
+      // Old format: just name
+      vendor_data = get_dummy_vendor_detail(game_id, vendor_value);
+    }
 
     if (!vendor_data) {
-      throw new Error(`Vendor not found: ${vendor_name}`);
+      throw new Error(`Vendor not found: ${vendor_value}`);
     }
 
     const vendor = {
@@ -347,7 +369,7 @@ const build_mobile_vendor_detail_embed = async (game_id: string, vendor_name: st
       .addFields(
         {
           name  : 'Price',
-          value : `\`${vendor.price}\``,
+          value : `\`Rp ${vendor.price.toLocaleString('id-ID')}\``,
           inline: true
         },
         {
@@ -374,7 +396,7 @@ const build_mobile_vendor_detail_embed = async (game_id: string, vendor_name: st
     const row = new ActionRowBuilder<ButtonBuilder>()
       .addComponents(button);
 
-    console.log(`[ - MOBILE_CATALOG_CONTROLLER - ] Vendor detail embed built for: ${vendor_name}`);
+    console.log(`[ - MOBILE_CATALOG_CONTROLLER - ] Vendor detail embed built for: ${vendor.name}`);
 
     return { embed, component: row };
   } catch (error) {

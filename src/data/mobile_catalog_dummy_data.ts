@@ -20,63 +20,222 @@ const __dummy_vendor_data: dummy_game_vendors[] = [
     game_id: 'pubg_mobile',
     vendors : [
       {
-        name         : 'PUBG UC 60 Pack',
-        price        : 1.50,
+        name         : 'TANTEDARA PLUGIN INDONESIA',
+        price        : 70000,
         stock_status : 'available',
         features_list: [
-          'Instant Delivery',
-          'Official UC',
-          'No Ban Guarantee',
-          '24/7 Support'
+          '3 Days Access',
+          'Android Plugin',
+          'Indonesian Server'
         ],
-        description: '60 Unknown Cash for your PUBG Mobile account'
+        description: 'Tantedara Plugin - 3 Days'
       },
       {
-        name         : 'PUBG UC 325 Pack',
-        price        : 7.50,
+        name         : 'TANTEDARA PLUGIN INDONESIA',
+        price        : 120000,
         stock_status : 'available',
         features_list: [
-          'Instant Delivery',
-          'Bonus UC Included',
-          'No Ban Guarantee',
-          '24/7 Support'
+          '7 Days Access',
+          'Android Plugin',
+          'Indonesian Server'
         ],
-        description: '325 Unknown Cash for your PUBG Mobile account'
+        description: 'Tantedara Plugin - 7 Days'
       },
       {
-        name         : 'PUBM UC 660 Pack',
-        price        : 14.50,
+        name         : 'TANTEDARA PLUGIN INDONESIA',
+        price        : 150000,
         stock_status : 'available',
         features_list: [
-          'Instant Delivery',
-          'Bonus UC Included',
-          'No Ban Guarantee',
-          'Priority Support'
+          '10 Days Access',
+          'Android Plugin',
+          'Indonesian Server'
         ],
-        description: '660 Unknown Cash for your PUBG Mobile account'
+        description: 'Tantedara Plugin - 10 Days'
       },
       {
-        name         : 'PUBG UC 1800 Pack',
-        price        : 35.00,
-        stock_status : 'pre_order',
+        name         : 'TANTEDARA PLUGIN INDONESIA',
+        price        : 250000,
+        stock_status : 'available',
         features_list: [
-          'Instant Delivery',
-          'Huge Bonus UC',
-          'No Ban Guarantee',
-          'VIP Support'
+          '30 Days Access',
+          'Android Plugin',
+          'Indonesian Server'
         ],
-        description: '1800 Unknown Cash for your PUBG Mobile account'
+        description: 'Tantedara Plugin - 30 Days'
       },
       {
-        name         : 'PUBG Royale Pass Month',
-        price        : 10.00,
-        stock_status : 'out_of_stock',
+        name         : 'KING Android',
+        price        : 40000,
+        stock_status : 'available',
         features_list: [
-          'Full RP Access',
-          'Exclusive Rewards',
-          'Rank Boost'
+          'ESP',
+          'AIMBOT',
+          'Bullet Tracking',
+          'Skin Hack (Full Effect)',
+          'Non Root & Root Support',
+          'Key Support'
         ],
-        description: '1 Month Royale Pass membership'
+        description: '1 Day Access - Key Support KING Android'
+      },
+      {
+        name         : 'KING Android',
+        price        : 150000,
+        stock_status : 'available',
+        features_list: [
+          'ESP',
+          'AIMBOT',
+          'Bullet Tracking',
+          'Skin Hack (Full Effect)',
+          'Non Root & Root Support',
+          'Key Support'
+        ],
+        description: '7 Days Access - Key Support KING Android'
+      },
+      {
+        name         : 'KING Android',
+        price        : 350000,
+        stock_status : 'available',
+        features_list: [
+          'ESP',
+          'AIMBOT',
+          'Bullet Tracking',
+          'Skin Hack (Full Effect)',
+          'Non Root & Root Support',
+          'Key Support'
+        ],
+        description: '30 Days Access - Key Support KING Android'
+      },
+      {
+        name         : 'SHIELD (Non Root)',
+        price        : 40000,
+        stock_status : 'available',
+        features_list: [
+          'ESP',
+          'Aimbot Smooth Aim',
+          'Recoil Compensation',
+          'Bullet Speed',
+          'IPAD View',
+          'Hide ESP Recording',
+          'Fight Mode (Aim Full Power)',
+          'Global | KR | VN | TW',
+          'Loader (Non Root)'
+        ],
+        description: '1 Day Access - SHIELD Global/KR/VN/TW'
+      },
+      {
+        name         : 'SHIELD (Non Root)',
+        price        : 130000,
+        stock_status : 'available',
+        features_list: [
+          'ESP',
+          'Aimbot Smooth Aim',
+          'Recoil Compensation',
+          'Bullet Speed',
+          'IPAD View',
+          'Hide ESP Recording',
+          'Fight Mode (Aim Full Power)',
+          'Global | KR | VN | TW',
+          'Loader (Non Root)'
+        ],
+        description: '7 Days Access - SHIELD Global/KR/VN/TW'
+      },
+      {
+        name         : 'SHIELD (Non Root)',
+        price        : 280000,
+        stock_status : 'available',
+        features_list: [
+          'ESP',
+          'Aimbot Smooth Aim',
+          'Recoil Compensation',
+          'Bullet Speed',
+          'IPAD View',
+          'Hide ESP Recording',
+          'Fight Mode (Aim Full Power)',
+          'Global | KR | VN | TW',
+          'Loader (Non Root)'
+        ],
+        description: '30 Days Access - SHIELD Global/KR/VN/TW'
+      },
+      {
+        name         : 'KING iOS',
+        price        : 40000,
+        stock_status : 'available',
+        features_list: [
+          'ESP',
+          'Aimbot / Bullet Tracking',
+          'Skin Hack Full Effect',
+          'Hide ESP Recording',
+          'PUBG iOS - GL / KR / VNG / TW (IPA)'
+        ],
+        description: '1 Day Access - KING iOS'
+      },
+      {
+        name         : 'KING iOS',
+        price        : 150000,
+        stock_status : 'available',
+        features_list: [
+          'ESP',
+          'Aimbot / Bullet Tracking',
+          'Skin Hack Full Effect',
+          'Hide ESP Recording',
+          'PUBG iOS - GL / KR / VNG / TW (IPA)'
+        ],
+        description: '7 Days Access - KING iOS'
+      },
+      {
+        name         : 'KING iOS',
+        price        : 350000,
+        stock_status : 'available',
+        features_list: [
+          'ESP',
+          'Aimbot / Bullet Tracking',
+          'Skin Hack Full Effect',
+          'Hide ESP Recording',
+          'PUBG iOS - GL / KR / VNG / TW (IPA)'
+        ],
+        description: '30 Days Access - KING iOS'
+      },
+      {
+        name         : 'OASIS iOS',
+        price        : 65000,
+        stock_status : 'available',
+        features_list: [
+          'ESP',
+          'Aimbot',
+          'Recoil Compensation',
+          'Skin & Kill Message',
+          'Hide ESP Recording / Live',
+          'PUBG Global | Korea | Vietnam (IPA)'
+        ],
+        description: '1 Day Access - OASIS iOS'
+      },
+      {
+        name         : 'OASIS iOS',
+        price        : 180000,
+        stock_status : 'available',
+        features_list: [
+          'ESP',
+          'Aimbot',
+          'Recoil Compensation',
+          'Skin & Kill Message',
+          'Hide ESP Recording / Live',
+          'PUBG Global | Korea | Vietnam (IPA)'
+        ],
+        description: '7 Days Access - OASIS iOS'
+      },
+      {
+        name         : 'OASIS iOS',
+        price        : 380000,
+        stock_status : 'available',
+        features_list: [
+          'ESP',
+          'Aimbot',
+          'Recoil Compensation',
+          'Skin & Kill Message',
+          'Hide ESP Recording / Live',
+          'PUBG Global | Korea | Vietnam (IPA)'
+        ],
+        description: '30 Days Access - OASIS iOS'
       }
     ]
   },
