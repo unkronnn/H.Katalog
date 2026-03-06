@@ -1,14 +1,20 @@
 // - DUMMY DATA FOR MOBILE CATALOG TESTING - \\
 
-interface dummy_vendor {
-  name         : string;
-  price        : number;
-  stock_status : 'available' | 'out_of_stock' | 'pre_order';
-  features_list: string[];
-  description? : string;
+export interface pricing_option {
+  duration: string;
+  price   : number;
 }
 
-interface dummy_game_vendors {
+export interface dummy_vendor {
+  name           : string;
+  pricing_options?: pricing_option[]; // Optional: for vendors with multiple pricing
+  price?         : number;             // Optional: for vendors with single price (old format)
+  stock_status   : 'available' | 'out_of_stock' | 'pre_order';
+  features_list  : string[];
+  description?   : string;
+}
+
+export interface dummy_game_vendors {
   game_id : string;
   vendors : dummy_vendor[];
 }
@@ -20,52 +26,27 @@ const __dummy_vendor_data: dummy_game_vendors[] = [
     game_id: 'pubg_mobile',
     vendors : [
       {
-        name         : 'TANTEDARA PLUGIN INDONESIA',
-        price        : 70000,
+        name           : 'TANTEDARA PLUGIN INDONESIA',
+        pricing_options: [
+          { duration: '3 Days',  price: 70000  },
+          { duration: '7 Days',  price: 120000 },
+          { duration: '10 Days', price: 150000 },
+          { duration: '30 Days', price: 250000 }
+        ],
         stock_status : 'available',
         features_list: [
-          '3 Days Access',
           'Android Plugin',
           'Indonesian Server'
         ],
-        description: 'Tantedara Plugin - 3 Days'
+        description: 'Tantedara Plugin Indonesia'
       },
       {
-        name         : 'TANTEDARA PLUGIN INDONESIA',
-        price        : 120000,
-        stock_status : 'available',
-        features_list: [
-          '7 Days Access',
-          'Android Plugin',
-          'Indonesian Server'
+        name           : 'KING Android',
+        pricing_options: [
+          { duration: '1 Day',   price: 40000 },
+          { duration: '7 Days',  price: 150000 },
+          { duration: '30 Days', price: 350000 }
         ],
-        description: 'Tantedara Plugin - 7 Days'
-      },
-      {
-        name         : 'TANTEDARA PLUGIN INDONESIA',
-        price        : 150000,
-        stock_status : 'available',
-        features_list: [
-          '10 Days Access',
-          'Android Plugin',
-          'Indonesian Server'
-        ],
-        description: 'Tantedara Plugin - 10 Days'
-      },
-      {
-        name         : 'TANTEDARA PLUGIN INDONESIA',
-        price        : 250000,
-        stock_status : 'available',
-        features_list: [
-          '30 Days Access',
-          'Android Plugin',
-          'Indonesian Server'
-        ],
-        description: 'Tantedara Plugin - 30 Days'
-      },
-      {
-        name         : 'KING Android',
-        price        : 40000,
         stock_status : 'available',
         features_list: [
           'ESP',
@@ -75,39 +56,15 @@ const __dummy_vendor_data: dummy_game_vendors[] = [
           'Non Root & Root Support',
           'Key Support'
         ],
-        description: '1 Day Access - Key Support KING Android'
+        description: 'Key Support KING Android (Non Root & Root)'
       },
       {
-        name         : 'KING Android',
-        price        : 150000,
-        stock_status : 'available',
-        features_list: [
-          'ESP',
-          'AIMBOT',
-          'Bullet Tracking',
-          'Skin Hack (Full Effect)',
-          'Non Root & Root Support',
-          'Key Support'
+        name           : 'SHIELD (Non Root)',
+        pricing_options: [
+          { duration: '1 Day',   price: 40000 },
+          { duration: '7 Days',  price: 130000 },
+          { duration: '30 Days', price: 280000 }
         ],
-        description: '7 Days Access - Key Support KING Android'
-      },
-      {
-        name         : 'KING Android',
-        price        : 350000,
-        stock_status : 'available',
-        features_list: [
-          'ESP',
-          'AIMBOT',
-          'Bullet Tracking',
-          'Skin Hack (Full Effect)',
-          'Non Root & Root Support',
-          'Key Support'
-        ],
-        description: '30 Days Access - Key Support KING Android'
-      },
-      {
-        name         : 'SHIELD (Non Root)',
-        price        : 40000,
         stock_status : 'available',
         features_list: [
           'ESP',
@@ -120,45 +77,15 @@ const __dummy_vendor_data: dummy_game_vendors[] = [
           'Global | KR | VN | TW',
           'Loader (Non Root)'
         ],
-        description: '1 Day Access - SHIELD Global/KR/VN/TW'
+        description: 'SHIELD Global/KR/VN/TW - Non Root Loader'
       },
       {
-        name         : 'SHIELD (Non Root)',
-        price        : 130000,
-        stock_status : 'available',
-        features_list: [
-          'ESP',
-          'Aimbot Smooth Aim',
-          'Recoil Compensation',
-          'Bullet Speed',
-          'IPAD View',
-          'Hide ESP Recording',
-          'Fight Mode (Aim Full Power)',
-          'Global | KR | VN | TW',
-          'Loader (Non Root)'
+        name           : 'KING iOS',
+        pricing_options: [
+          { duration: '1 Day',   price: 40000 },
+          { duration: '7 Days',  price: 150000 },
+          { duration: '30 Days', price: 350000 }
         ],
-        description: '7 Days Access - SHIELD Global/KR/VN/TW'
-      },
-      {
-        name         : 'SHIELD (Non Root)',
-        price        : 280000,
-        stock_status : 'available',
-        features_list: [
-          'ESP',
-          'Aimbot Smooth Aim',
-          'Recoil Compensation',
-          'Bullet Speed',
-          'IPAD View',
-          'Hide ESP Recording',
-          'Fight Mode (Aim Full Power)',
-          'Global | KR | VN | TW',
-          'Loader (Non Root)'
-        ],
-        description: '30 Days Access - SHIELD Global/KR/VN/TW'
-      },
-      {
-        name         : 'KING iOS',
-        price        : 40000,
         stock_status : 'available',
         features_list: [
           'ESP',
@@ -167,37 +94,15 @@ const __dummy_vendor_data: dummy_game_vendors[] = [
           'Hide ESP Recording',
           'PUBG iOS - GL / KR / VNG / TW (IPA)'
         ],
-        description: '1 Day Access - KING iOS'
+        description: 'KING iOS - GL / KR / VNG / TW (IPA)'
       },
       {
-        name         : 'KING iOS',
-        price        : 150000,
-        stock_status : 'available',
-        features_list: [
-          'ESP',
-          'Aimbot / Bullet Tracking',
-          'Skin Hack Full Effect',
-          'Hide ESP Recording',
-          'PUBG iOS - GL / KR / VNG / TW (IPA)'
+        name           : 'OASIS iOS',
+        pricing_options: [
+          { duration: '1 Day',   price: 65000 },
+          { duration: '7 Days',  price: 180000 },
+          { duration: '30 Days', price: 380000 }
         ],
-        description: '7 Days Access - KING iOS'
-      },
-      {
-        name         : 'KING iOS',
-        price        : 350000,
-        stock_status : 'available',
-        features_list: [
-          'ESP',
-          'Aimbot / Bullet Tracking',
-          'Skin Hack Full Effect',
-          'Hide ESP Recording',
-          'PUBG iOS - GL / KR / VNG / TW (IPA)'
-        ],
-        description: '30 Days Access - KING iOS'
-      },
-      {
-        name         : 'OASIS iOS',
-        price        : 65000,
         stock_status : 'available',
         features_list: [
           'ESP',
@@ -207,35 +112,7 @@ const __dummy_vendor_data: dummy_game_vendors[] = [
           'Hide ESP Recording / Live',
           'PUBG Global | Korea | Vietnam (IPA)'
         ],
-        description: '1 Day Access - OASIS iOS'
-      },
-      {
-        name         : 'OASIS iOS',
-        price        : 180000,
-        stock_status : 'available',
-        features_list: [
-          'ESP',
-          'Aimbot',
-          'Recoil Compensation',
-          'Skin & Kill Message',
-          'Hide ESP Recording / Live',
-          'PUBG Global | Korea | Vietnam (IPA)'
-        ],
-        description: '7 Days Access - OASIS iOS'
-      },
-      {
-        name         : 'OASIS iOS',
-        price        : 380000,
-        stock_status : 'available',
-        features_list: [
-          'ESP',
-          'Aimbot',
-          'Recoil Compensation',
-          'Skin & Kill Message',
-          'Hide ESP Recording / Live',
-          'PUBG Global | Korea | Vietnam (IPA)'
-        ],
-        description: '30 Days Access - OASIS iOS'
+        description: 'OASIS iOS - Global | Korea | Vietnam'
       }
     ]
   },
@@ -692,8 +569,6 @@ const get_dummy_vendor_detail = (game_id: string, vendor_name: string): dummy_ve
 // - EXPORTS - \\
 
 export {
-  dummy_vendor,
-  dummy_game_vendors,
   __dummy_vendor_data,
   get_dummy_vendors_by_game,
   get_dummy_vendor_detail

@@ -13,6 +13,7 @@ import {
   get_dummy_vendors_by_game,
   get_dummy_vendor_detail
 }                                     from '../../data/mobile_catalog_dummy_data';
+import type { pricing_option }         from '../../data/mobile_catalog_dummy_data';
 
 // - GAME EMOJI MAPPINGS - \\
 
@@ -241,24 +242,31 @@ const build_mobile_vendor_selection_embed = async (game_id: string): Promise<{
       pre_order   : '◷'
     };
 
-    const options = vendors.map((vendor, index) => {
+    const options = vendors.map((vendor) => {
       const stock_emoji = stock_emoji_map[vendor.stock_status as keyof typeof stock_emoji_map] || '•';
 
-      // Extract duration from description for unique label
-      const duration_match = (vendor.description || '').match(/(\d+ Day|Days)/);
-      const duration_text = duration_match ? duration_match[1] : '';
+      // Handle both old (price) and new (pricing_options) format
+      let price_range: string;
 
-      // Create unique label and value
-      const unique_label = duration_text
-        ? `${vendor.name} (${duration_text})`
-        : vendor.name;
-
-      const unique_value = `${vendor.name}::${index}`;
+      if (vendor.pricing_options && vendor.pricing_options.length > 0) {
+        // New format with pricing_options
+        const prices = vendor.pricing_options.map(opt => opt.price);
+        const min_price = Math.min(...prices);
+        const max_price = Math.max(...prices);
+        price_range = min_price === max_price
+          ? `Rp ${min_price.toLocaleString('id-ID')}`
+          : `Rp ${min_price.toLocaleString('id-ID')} - Rp ${max_price.toLocaleString('id-ID')}`;
+      } else if (vendor.price) {
+        // Old format with single price
+        price_range = `Rp ${(vendor as any).price.toLocaleString('id-ID')}`;
+      } else {
+        price_range = 'Price not available';
+      }
 
       return {
-        label      : unique_label,
-        value      : unique_value,
-        description: `Rp ${vendor.price.toLocaleString('id-ID')} - ${vendor.stock_status.replace('_', ' ')} ${stock_emoji}`
+        label      : vendor.name,
+        value      : vendor.name,
+        description: `${price_range} - ${vendor.stock_status.replace('_', ' ')} ${stock_emoji}`
       };
     });
 
@@ -340,11 +348,12 @@ const build_mobile_vendor_detail_embed = async (game_id: string, vendor_value: s
     }
 
     const vendor = {
-      name         : vendor_data.name,
-      price        : vendor_data.price,
-      stock_status : vendor_data.stock_status,
-      features_list: vendor_data.features_list,
-      description  : vendor_data.description
+      name           : vendor_data.name,
+      pricing_options: (vendor_data as any).pricing_options || [],
+      price          : (vendor_data as any).price,
+      stock_status   : vendor_data.stock_status,
+      features_list  : vendor_data.features_list,
+      description    : vendor_data.description
     };
 
     const stock_emoji_map = {
@@ -359,6 +368,37 @@ const build_mobile_vendor_detail_embed = async (game_id: string, vendor_value: s
       ? vendor.features_list.map((feature, index) => `${index + 1}. ${feature}`).join('\n')
       : 'No features listed';
 
+    // - BUILD PRICING TEXT - \\
+
+    let pricing_text: string;
+    let price_field: any;
+
+    if (vendor.pricing_options && vendor.pricing_options.length > 0) {
+      // New format: multiple pricing options
+      pricing_text = vendor.pricing_options
+        .map((opt: pricing_option) => `**${opt.duration}**: \`Rp ${opt.price.toLocaleString('id-ID')}\``)
+        .join('\n');
+
+      price_field = {
+        name  : 'Pricing Options',
+        value : pricing_text,
+        inline: false
+      };
+    } else if (vendor.price) {
+      // Old format: single price
+      price_field = {
+        name  : 'Price',
+        value : `\`Rp ${vendor.price.toLocaleString('id-ID')}\``,
+        inline: true
+      };
+    } else {
+      price_field = {
+        name  : 'Price',
+        value : 'Contact for pricing',
+        inline: true
+      };
+    }
+
     // - CREATE EMBED WITH FIELDS (matching envy_bot style) - \\
 
     const embed = new EmbedBuilder()
@@ -367,15 +407,11 @@ const build_mobile_vendor_detail_embed = async (game_id: string, vendor_value: s
       .setThumbnail('https://ui.shadcn.com/favicon.ico')
       .setDescription(vendor.description || 'No description available.')
       .addFields(
-        {
-          name  : 'Price',
-          value : `\`Rp ${vendor.price.toLocaleString('id-ID')}\``,
-          inline: true
-        },
+        price_field,
         {
           name  : 'Stock Status',
           value : `${vendor.stock_status.replace('_', ' ')} ${stock_emoji}`,
-          inline: true
+          inline: typeof vendor.price !== 'undefined' // Only inline if single price
         },
         {
           name  : 'Features',
