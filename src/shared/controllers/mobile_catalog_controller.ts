@@ -165,34 +165,36 @@ const build_mobile_catalog_embed = async (): Promise<{
       };
     });
 
-    // - BUILD GAME LIST TEXT - \\
+    // - BUILD GAME LIST WITH EMOJIS - \\
 
-    const game_list_parts = [];
+    const game_list_parts = __mobile_games.map((game) =>
+      `${game.emoji} **${game.game_name}**`
+    ).join('\n');
 
-    for (const game of __mobile_games) {
-      game_list_parts.push(`${game.emoji} **${game.game_name}** - ${game.description}`);
-    }
-
-    // - CREATE EMBED - \\
+    // - CREATE EMBED WITH FIELDS (matching envy_bot style) - \\
 
     const embed = new EmbedBuilder()
       .setColor(__embed_color)
       .setTitle(`${__game_emoji_map.mobile_legends} Mobile Games Catalog`)
-      .setDescription(
-        [
-          game_list_parts.join('\n'),
-          '',
-          '**How to Order**',
-          '1. Select a game from the dropdown menu',
-          '2. Choose an available vendor',
-          '3. Click "Buy Now" button to purchase',
-          '',
-          '*Powered by shadcn/ui*'
-        ].join('\n')
-      )
       .setThumbnail('https://ui.shadcn.com/favicon.ico')
+      .addFields(
+        {
+          name  : 'Available Games',
+          value : game_list_parts || 'No games available',
+          inline: false
+        },
+        {
+          name  : 'How to Order',
+          value : [
+            '1. Select a game from the dropdown menu',
+            '2. Choose an available vendor',
+            '3. Click "Buy Now" button to purchase'
+          ].join('\n'),
+          inline: false
+        }
+      )
       .setTimestamp()
-      .setFooter({ text: 'H.Katalog Bot' });
+      .setFooter({ text: 'Powered by shadcn/ui • H.Katalog Bot' });
 
     // - CREATE SELECT MENU COMPONENT - \\
 
@@ -249,21 +251,27 @@ const build_mobile_vendor_selection_embed = async (game_id: string): Promise<{
       };
     });
 
-    // - CREATE EMBED - \\
+    // - CREATE EMBED WITH FIELDS (matching envy_bot style) - \\
 
     const embed = new EmbedBuilder()
       .setColor(__embed_color)
-      .setTitle(`${selected_game.emoji} ${selected_game.game_name} - Vendors`)
-      .setDescription(
-        [
-          'Please select a vendor to view product details:',
-          '',
-          '*Powered by shadcn/ui*'
-        ].join('\n')
-      )
+      .setTitle(`${selected_game.emoji} ${selected_game.game_name} - Select Vendor`)
       .setThumbnail('https://ui.shadcn.com/favicon.ico')
+      .setDescription('Please select a vendor from the dropdown menu below to view product details and purchase.')
+      .addFields(
+        {
+          name  : 'Available Vendors',
+          value : `${vendors.length} vendor(s) available`,
+          inline: true
+        },
+        {
+          name  : 'Stock Status',
+          value : '✓ Available | ✗ Out of Stock | ◷ Pre-Order',
+          inline: true
+        }
+      )
       .setTimestamp()
-      .setFooter({ text: 'H.Katalog Bot' });
+      .setFooter({ text: 'Powered by shadcn/ui • H.Katalog Bot' });
 
     // - CREATE SELECT MENU COMPONENT - \\
 
@@ -329,27 +337,32 @@ const build_mobile_vendor_detail_embed = async (game_id: string, vendor_name: st
       ? vendor.features_list.map((feature, index) => `${index + 1}. ${feature}`).join('\n')
       : 'No features listed';
 
-    // - CREATE EMBED - \\
+    // - CREATE EMBED WITH FIELDS (matching envy_bot style) - \\
 
     const embed = new EmbedBuilder()
       .setColor(__embed_color)
       .setTitle(`${selected_game.emoji} ${vendor.name}`)
-      .setDescription(
-        [
-          vendor.description || '',
-          '',
-          `**Price:** \`${vendor.price}\``,
-          `**Stock:** ${vendor.stock_status.replace('_', ' ')} ${stock_emoji}`,
-          '',
-          '**Features:**',
-          features_text,
-          '',
-          '*Click the button below to purchase*'
-        ].join('\n')
-      )
       .setThumbnail('https://ui.shadcn.com/favicon.ico')
+      .setDescription(vendor.description || 'No description available.')
+      .addFields(
+        {
+          name  : 'Price',
+          value : `\`${vendor.price}\``,
+          inline: true
+        },
+        {
+          name  : 'Stock Status',
+          value : `${vendor.stock_status.replace('_', ' ')} ${stock_emoji}`,
+          inline: true
+        },
+        {
+          name  : 'Features',
+          value : features_text,
+          inline: false
+        }
+      )
       .setTimestamp()
-      .setFooter({ text: 'H.Katalog Bot' });
+      .setFooter({ text: 'Powered by shadcn/ui • H.Katalog Bot' });
 
     // - CREATE BUTTON COMPONENT - \\
 
