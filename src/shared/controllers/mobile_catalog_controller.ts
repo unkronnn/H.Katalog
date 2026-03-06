@@ -1,7 +1,6 @@
 import {
   Interaction,
-  StringSelectMenuInteraction,
-  MessageFlags
+  StringSelectMenuInteraction
 }                                     from 'discord.js';
 import { log_error }                   from '../../utils/error_logger';
 import {
@@ -12,7 +11,8 @@ import {
   action_row,
   link_button,
   select_menu,
-  build_message
+  build_message,
+  message_payload
 }                                     from '../../utils/components';
 import { send_components_v2, get_token } from '../../utils/api';
 import {
@@ -459,13 +459,16 @@ const show_mobile_catalog = async (interaction: Interaction): Promise<void> => {
     if (interaction.isRepliable()) {
       // - SEND VIA DISCORD API (Public Permanent Message) - \\
 
+      const { flags, ...message_without_flags } = message as any;
+
+      if (!interaction.channelId) {
+        throw new Error('Channel ID is missing from interaction');
+      }
+
       const result = await send_components_v2(
         interaction.channelId,
         get_token(),
-        {
-          ...message,
-          flags: undefined // No flags = public message
-        }
+        message_without_flags
       );
 
       if (result.error) {

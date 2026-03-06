@@ -224,13 +224,22 @@ export function link_button(
 
 /**
  * Create action row component
- * @param components button_component[]
+ * @param components (button_component | select_menu_component | action_row_component)[]
  * @return action_row_component
  */
-export function action_row(...components: button_component[]): action_row_component {
+export function action_row(...components: (button_component | select_menu_component | action_row_component)[]): action_row_component {
+  const flattened = components.flatMap(c => {
+    if ('type' in c && c.type === component_type.action_row) {
+      // Already an action_row, extract its components
+      return (c as action_row_component).components;
+    }
+    // Button or select_menu, wrap in array
+    return [c];
+  });
+
   return {
     type     : component_type.action_row,
-    components,
+    components: flattened as any[],
   };
 }
 
@@ -413,22 +422,6 @@ export function file(url: string): file_component {
     file: { url },
   };
 }
-
-// - EXPORT TYPES - \\
-
-export type {
-  button_component,
-  action_row_component,
-  select_option,
-  select_menu_component,
-  thumbnail_component,
-  text_component,
-  section_component,
-  divider_component,
-  container_component,
-  message_payload,
-  file_component
-};
 
 // - LEGACY FUNCTIONS (Backward compatibility) - \\
 

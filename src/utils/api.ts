@@ -112,9 +112,17 @@ export async function edit_components_v2(
 }
 
 /**
- * Get bot token
- * @return string
+ * Get bot token from environment
+ * @return {string} Bot token
+ * @throws {Error} if DISCORD_TOKEN not found
  */
 export function get_token(): string {
-  return process.env.DISCORD_TOKEN || '';
+  const token = process.env.DISCORD_TOKEN;
+
+  if (!token) {
+    throw new Error('DISCORD_TOKEN not found in environment variables');
+  }
+
+  // Type assertion since we've validated it's not null
+  return token as string;
 }
