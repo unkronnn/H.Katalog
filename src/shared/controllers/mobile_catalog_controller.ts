@@ -125,6 +125,25 @@ const __mobile_games     : mobile_game[] = [
 const __embed_color        = 0x2B2D31; // Dark neutral color for clean look
 const __max_display_items  = 25;
 
+// - HELPER FUNCTIONS - \\
+
+/**
+ * Parse custom emoji string to extract name and ID
+ * @param emoji_string string - Format: <:name:id> or <a:name:id>
+ * @return { id?: string; name: string } | null
+ */
+const parse_custom_emoji = (emoji_string: string): { id?: string; name: string } | null => {
+  const match = emoji_string.match(/<(a)?:([^:]+):(\d+)>/);
+  if (match) {
+    return {
+      id: match[3],
+      name: match[2]
+    };
+  }
+  // If not a custom emoji, return it as-is for unicode emojis
+  return { name: emoji_string };
+};
+
 // - EMBED BUILDERS - \\
 
 /**
@@ -136,12 +155,15 @@ const build_mobile_catalog_embed = async (): Promise<{
   component: ActionRowBuilder<StringSelectMenuBuilder>;
 }> => {
   try {
-    const options = __mobile_games.map((game) => ({
-      label      : game.game_name,
-      value      : game.game_id,
-      description: game.description,
-      emoji      : { name: game.emoji.replace(/<:([^:]+):[^>]+>/, '$1') }
-    }));
+    const options = __mobile_games.map((game) => {
+      const parsed_emoji = parse_custom_emoji(game.emoji);
+      return {
+        label      : game.game_name,
+        value      : game.game_id,
+        description: game.description,
+        emoji      : parsed_emoji || undefined
+      };
+    });
 
     // - BUILD GAME LIST TEXT - \\
 
