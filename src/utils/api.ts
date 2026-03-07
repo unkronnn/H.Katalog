@@ -126,3 +126,12 @@ export function get_token(): string {
   // Type assertion since we've validated it's not null
   return token as string;
 }
+
+// - API NAMESPACE EXPORT - \\
+
+export const api = {
+  send_components_v2,
+  edit_components_v2,
+  get_token,
+};
+

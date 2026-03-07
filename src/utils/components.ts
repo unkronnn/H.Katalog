@@ -509,3 +509,25 @@ export function create_button_v2(
 
   return row;
 }
+
+// - COMPONENT NAMESPACE EXPORT - \\
+
+export const component = {
+  primary_button,
+  secondary_button,
+  success_button,
+  danger_button,
+  link_button,
+  action_row,
+  select_menu,
+  thumbnail,
+  text,
+  section,
+  divider,
+  separator,
+  container,
+  build_message,
+  emoji_object,
+  file,
+};
+
