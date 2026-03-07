@@ -129,7 +129,6 @@ const __mobile_games     : mobile_game[] = [
 
 // - CONSTANTS - \\
 
-const __embed_color       = 0x2B2D31;
 const __max_display_items = 25;
 
 // - HELPER FUNCTIONS - \\
@@ -221,7 +220,7 @@ const build_mobile_vendor_selection_embed = async (game_id: string): Promise<imp
 
     const vendors = get_dummy_vendors_by_game(game_id);
 
-    // - BUILD VENDOR LIST WITH EMOJIS - \\
+    // - BUILD VENDOR LIST - \\
 
     const vendor_list_parts = vendors.map((vendor) => {
       const emoji = __pubg_vendor_emoji_map[vendor.name] || '🧀';
@@ -401,8 +400,8 @@ const build_mobile_vendor_detail_embed = async (game_id: string, vendor_value: s
  */
 const handle_mobile_game_selection = async (interaction: StringSelectMenuInteraction): Promise<void> => {
   try {
-    const game_id        = interaction.values[0];
-    const message        = await build_mobile_vendor_selection_embed(game_id);
+    const game_id = interaction.values[0];
+    const message = await build_mobile_vendor_selection_embed(game_id);
 
     await interaction.reply({
       ...message,
