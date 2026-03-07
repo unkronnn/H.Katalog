@@ -470,14 +470,34 @@ export function create_select_menu_v2(
     label      : string;
     value      : string;
     description: string;
-    emoji?     : string;
+    emoji?     : string | { id?: string; name: string };
   }>
 ): ActionRowBuilder<StringSelectMenuBuilder> {
   const select_menu = new StringSelectMenuBuilder();
 
   select_menu.setCustomId(custom_id);
   select_menu.setPlaceholder(placeholder);
-  select_menu.addOptions(options);
+
+  // Convert options to Discord.js format
+  const discord_options = options.map(opt => {
+    const result: any = {
+      label: opt.label,
+      value: opt.value,
+      description: opt.description
+    };
+
+    if (opt.emoji) {
+      if (typeof opt.emoji === 'string') {
+        result.emoji = opt.emoji;
+      } else {
+        result.emoji = opt.emoji;
+      }
+    }
+
+    return result;
+  });
+
+  select_menu.addOptions(discord_options);
 
   const row = new ActionRowBuilder<StringSelectMenuBuilder>();
   row.addComponents(select_menu);
@@ -492,7 +512,7 @@ export function create_button_v2(
   label : string,
   style : ButtonStyle,
   url   : string,
-  emoji?: string
+  emoji?: string | { id?: string; name: string }
 ): ActionRowBuilder<ButtonBuilder> {
   const button = new ButtonBuilder();
 
@@ -501,7 +521,11 @@ export function create_button_v2(
   button.setURL(url);
 
   if (emoji) {
-    button.setEmoji(emoji);
+    if (typeof emoji === 'string') {
+      button.setEmoji(emoji);
+    } else {
+      button.setEmoji(emoji);
+    }
   }
 
   const row = new ActionRowBuilder<ButtonBuilder>();
@@ -529,5 +553,9 @@ export const component = {
   build_message,
   emoji_object,
   file,
+  // Legacy functions for backward compatibility
+  create_embed_v2,
+  create_select_menu_v2,
+  create_button_v2,
 };
 

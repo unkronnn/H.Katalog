@@ -1,7 +1,9 @@
 import {
   Interaction,
   StringSelectMenuInteraction,
-  MessageFlags
+  MessageFlags,
+  EmbedBuilder,
+  ComponentBuilder
 } from 'discord.js';
 import { log_error } from '../../utils/error_logger';
 import {
@@ -153,14 +155,22 @@ const parse_custom_emoji = (emoji_string: string): { id?: string; name: string }
 // - EMBED BUILDERS - \\
 
 /**
- * Build mobile games catalog message (Component V2)
- * @return Promise<import('../../utils/components').message_payload>
+ * Build mobile games catalog message (Traditional Discord.js)
+ * @return Promise<{ embeds: EmbedBuilder[], components: ComponentBuilder[] }>
  */
-const build_mobile_catalog_embed = async (): Promise<import('../../utils/components').message_payload> => {
+const build_mobile_catalog_embed = async (): Promise<{ embeds: EmbedBuilder[], components: any[] }> => {
   try {
     const game_list_parts = __mobile_games.map((game) =>
       `${game.emoji} ${game.game_name}`
     ).join('\n');
+
+    // - BUILD EMBED - \\
+
+    const embed = new EmbedBuilder()
+      .setColor(0x2B2D31)
+      .setTitle('📱 Mobile Games Catalog')
+      .setDescription(game_list_parts)
+      .setTimestamp();
 
     // - BUILD SELECT OPTIONS - \\
 
@@ -174,29 +184,20 @@ const build_mobile_catalog_embed = async (): Promise<import('../../utils/compone
       };
     }).slice(0, __max_display_items);
 
-    // - BUILD COMPONENT V2 MESSAGE - \\
+    // - BUILD COMPONENT - \\
 
-    const message = component.build_message({
-      components: [
-        component.container({
-          components: [
-            component.text(game_list_parts),
-            component.divider(),
-            component.action_row(
-              component.select_menu(
-                'mobile_catalog_select_game',
-                'Select a mobile game to view catalog',
-                select_options
-              )
-            ),
-          ],
-        }),
-      ],
-    });
+    const select_menu = component.create_select_menu_v2(
+      'mobile_catalog_select_game',
+      'Select a mobile game to view catalog',
+      select_options
+    );
 
     console.log('[ - MOBILE_CATALOG_CONTROLLER - ] Mobile catalog message built successfully');
 
-    return message;
+    return {
+      embeds: [embed],
+      components: [select_menu]
+    };
   } catch (error) {
     await log_error(error);
     throw error;
@@ -204,11 +205,11 @@ const build_mobile_catalog_embed = async (): Promise<import('../../utils/compone
 };
 
 /**
- * Build vendor selection message for selected mobile game (Component V2)
+ * Build vendor selection message for selected mobile game (Traditional Discord.js)
  * @param game_id string
- * @return Promise<import('../../utils/components').message_payload>
+ * @return Promise<{ embeds: EmbedBuilder[], components: any[] }>
  */
-const build_mobile_vendor_selection_embed = async (game_id: string): Promise<import('../../utils/components').message_payload> => {
+const build_mobile_vendor_selection_embed = async (game_id: string): Promise<{ embeds: EmbedBuilder[], components: any[] }> => {
   try {
     const selected_game = __mobile_games.find((game) => game.game_id === game_id);
 
@@ -224,6 +225,14 @@ const build_mobile_vendor_selection_embed = async (game_id: string): Promise<imp
       const emoji = __pubg_vendor_emoji_map[vendor.name] || '🧀';
       return `${emoji} ${vendor.name}`;
     }).join('\n');
+
+    // - BUILD EMBED - \\
+
+    const embed = new EmbedBuilder()
+      .setColor(0x2B2D31)
+      .setTitle(`${selected_game.emoji} ${selected_game.game_name} - Vendors`)
+      .setDescription(vendor_list_parts)
+      .setTimestamp();
 
     // - BUILD SELECT OPTIONS - \\
 
@@ -253,29 +262,20 @@ const build_mobile_vendor_selection_embed = async (game_id: string): Promise<imp
       };
     });
 
-    // - BUILD COMPONENT V2 MESSAGE - \\
+    // - BUILD COMPONENT - \\
 
-    const message = component.build_message({
-      components: [
-        component.container({
-          components: [
-            component.text(vendor_list_parts),
-            component.divider(),
-            component.action_row(
-              component.select_menu(
-                `mobile_catalog_select_vendor:${game_id}`,
-                'Select a vendor to view details',
-                select_options.slice(0, __max_display_items)
-              )
-            ),
-          ],
-        }),
-      ],
-    });
+    const select_menu = component.create_select_menu_v2(
+      `mobile_catalog_select_vendor:${game_id}`,
+      'Select a vendor to view details',
+      select_options.slice(0, __max_display_items)
+    );
 
     console.log(`[ - MOBILE_CATALOG_CONTROLLER - ] Vendor selection message built for game: ${game_id}`);
 
-    return message;
+    return {
+      embeds: [embed],
+      components: [select_menu]
+    };
   } catch (error) {
     await log_error(error);
     throw error;
@@ -283,15 +283,15 @@ const build_mobile_vendor_selection_embed = async (game_id: string): Promise<imp
 };
 
 /**
- * Build vendor detail message with purchase button (Component V2)
+ * Build vendor detail message with purchase button (Traditional Discord.js)
  * @param game_id string
  * @param vendor_value string
- * @return Promise<import('../../utils/components').message_payload>
+ * @return Promise<{ embeds: EmbedBuilder[], components: any[] }>
  */
 const build_mobile_vendor_detail_embed = async (
   game_id      : string,
   vendor_value : string
-): Promise<import('../../utils/components').message_payload> => {
+): Promise<{ embeds: EmbedBuilder[], components: any[] }> => {
   try {
     const selected_game = __mobile_games.find((game) => game.game_id === game_id);
 
@@ -353,58 +353,44 @@ const build_mobile_vendor_detail_embed = async (
       pricing_text = 'Contact for pricing';
     }
 
-    // - BUILD COMPONENT V2 MESSAGE - \\
+    // - BUILD EMBED DESCRIPTION - \\
 
-    const message_components: (ReturnType<typeof component.text> | ReturnType<typeof component.divider> | ReturnType<typeof component.action_row>)[] = [];
-
-    // - ADD HEADER WITH GAME EMOJI AND VENDOR NAME - \\
     const vendor_emoji = __pubg_vendor_emoji_map[vendor.name];
     const header_text  = vendor_emoji
       ? `${vendor_emoji} **${vendor.name}**`
       : `**${vendor.name}**`;
 
-    message_components.push(component.text(header_text));
-    message_components.push(component.divider());
+    let description_parts = header_text;
 
-    // - ADD DESCRIPTION IF EXISTS - \\
     if (vendor.description) {
-      message_components.push(component.text(vendor.description));
-      message_components.push(component.divider());
+      description_parts += `\n\n${vendor.description}`;
     }
 
-    // - ADD PRICING, STOCK, AND FEATURES - \\
-    const details_text = [
-      `**Pricing**`,
-      pricing_text,
-      '',
-      `**Stock Status**`,
-      `${vendor.stock_status.replace('_', ' ')} ${stock_emoji}`,
-      '',
-      `**Features**`,
-      features_text
-    ].join('\n');
+    description_parts += `\n\n**Pricing**\n${pricing_text}\n\n**Stock Status**\n${vendor.stock_status.replace('_', ' ')} ${stock_emoji}\n\n**Features**\n${features_text}`;
 
-    message_components.push(component.text(details_text));
-    message_components.push(component.divider());
+    // - BUILD EMBED - \\
 
-    // - ADD BUY NOW BUTTON - \\
-    message_components.push(
-      component.action_row(
-        component.link_button('Buy Now', 'https://discord.gg/ticket-channel-dummy')
-      )
+    const embed = new EmbedBuilder()
+      .setColor(0x2B2D31)
+      .setTitle(`${selected_game.emoji} ${selected_game.game_name} - Vendor Details`)
+      .setDescription(description_parts)
+      .setTimestamp();
+
+    // - BUILD BUTTON - \\
+
+    const button = component.create_button_v2(
+      'Buy Now',
+      5, // ButtonStyle.Link
+      'https://discord.gg/ticket-channel-dummy',
+      '🛒'
     );
-
-    const message = component.build_message({
-      components: [
-        component.container({
-          components: message_components,
-        }),
-      ],
-    });
 
     console.log(`[ - MOBILE_CATALOG_CONTROLLER - ] Vendor detail message built for: ${vendor.name}`);
 
-    return message;
+    return {
+      embeds: [embed],
+      components: [button]
+    };
   } catch (error) {
     await log_error(error);
     throw error;
@@ -421,10 +407,11 @@ const build_mobile_vendor_detail_embed = async (
 const handle_mobile_game_selection = async (interaction: StringSelectMenuInteraction): Promise<void> => {
   try {
     const game_id = interaction.values[0];
-    const message = await build_mobile_vendor_selection_embed(game_id);
+    const { embeds, components } = await build_mobile_vendor_selection_embed(game_id);
 
     await interaction.reply({
-      ...message,
+      embeds,
+      components,
       flags: MessageFlags.Ephemeral
     });
 
@@ -447,9 +434,12 @@ const handle_mobile_vendor_selection = async (
 ): Promise<void> => {
   try {
     const vendor_value = interaction.values[0];
-    const message      = await build_mobile_vendor_detail_embed(game_id, vendor_value);
+    const { embeds, components } = await build_mobile_vendor_detail_embed(game_id, vendor_value);
 
-    await interaction.update(message);
+    await interaction.update({
+      embeds,
+      components
+    });
 
     console.log(`[ - MOBILE_CATALOG_CONTROLLER - ] Mobile vendor selected: ${vendor_value} for game: ${game_id}`);
   } catch (error) {
@@ -490,7 +480,7 @@ const handle_mobile_catalog_interaction = async (interaction: Interaction): Prom
  */
 const show_mobile_catalog = async (interaction: Interaction): Promise<void> => {
   try {
-    const message = await build_mobile_catalog_embed();
+    const { embeds, components } = await build_mobile_catalog_embed();
 
     if (interaction.isRepliable()) {
       const channel = interaction.channel;
@@ -498,7 +488,10 @@ const show_mobile_catalog = async (interaction: Interaction): Promise<void> => {
         throw new Error('Channel is missing or does not support sending messages');
       }
 
-      await channel.send(message);
+      await channel.send({
+        embeds,
+        components
+      });
 
       await interaction.reply({
         content: 'Mobile catalog sent!',
